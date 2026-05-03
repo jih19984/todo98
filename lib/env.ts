@@ -11,9 +11,13 @@ export type PublicEnv =
       message: string;
     };
 
-export function getPublicEnv(source: NodeJS.ProcessEnv = process.env): PublicEnv {
-  const supabaseUrl = source.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const supabaseAnonKey = source.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+export function getPublicEnv(source?: NodeJS.ProcessEnv): PublicEnv {
+  const supabaseUrl = (
+    source ? source.NEXT_PUBLIC_SUPABASE_URL : process.env.NEXT_PUBLIC_SUPABASE_URL
+  )?.trim();
+  const supabaseAnonKey = (
+    source ? source.NEXT_PUBLIC_SUPABASE_ANON_KEY : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )?.trim();
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return {
