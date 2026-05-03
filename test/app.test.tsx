@@ -2,6 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import Home from "@/app/page";
 
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn((url: string) => {
+    throw new Error(`NEXT_REDIRECT:${url}`);
+  }),
+}));
+
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: async () => ({
     auth: {
@@ -23,5 +29,11 @@ describe("Home page", () => {
     render(await Home({ searchParams: Promise.resolve({ auth_error: "OAuth 설정을 확인해주세요." }) }));
 
     expect(screen.getByText("OAuth 설정을 확인해주세요.")).toBeInTheDocument();
+  });
+
+  it("redirects root OAuth codes to the callback route", async () => {
+    await expect(Home({ searchParams: Promise.resolve({ code: "oauth-code" }) })).rejects.toThrow(
+      "NEXT_REDIRECT:/auth/callback?code=oauth-code",
+    );
   });
 });

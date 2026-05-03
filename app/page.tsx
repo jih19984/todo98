@@ -3,15 +3,21 @@ import { TaskDesktop } from "@/components/tasks/TaskDesktop";
 import { RetroWindow } from "@/components/ui/RetroWindow";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createTaskService, type TaskRecord } from "@/lib/tasks";
+import { redirect } from "next/navigation";
 
 interface HomeProps {
   searchParams?: Promise<{
     auth_error?: string;
+    code?: string;
   }>;
 }
 
 export default async function Home({ searchParams }: HomeProps = {}) {
   const params = await searchParams;
+  if (params?.code) {
+    redirect(`/auth/callback?code=${encodeURIComponent(params.code)}`);
+  }
+
   let setupError = params?.auth_error ?? null;
   let tasks: TaskRecord[] = [];
 
