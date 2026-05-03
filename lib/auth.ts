@@ -2,13 +2,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type OAuthProvider = "google" | "kakao";
 
+function getOAuthOptions(provider: OAuthProvider, origin: string) {
+  return {
+    redirectTo: `${origin}/auth/callback`,
+    ...(provider === "kakao" ? { scopes: "profile_nickname" } : {}),
+  };
+}
+
 export function createOAuthLogin(client: SupabaseClient, origin: string) {
   return async function login(provider: OAuthProvider) {
     const { error } = await client.auth.signInWithOAuth({
       provider,
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-      },
+      options: getOAuthOptions(provider, origin),
     });
 
     if (error) {
