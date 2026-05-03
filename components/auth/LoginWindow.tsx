@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createOAuthLogin, type OAuthProvider } from "@/lib/auth";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { RetroWindow } from "@/components/ui/RetroWindow";
+import { createOAuthLogin, type OAuthProvider } from "@/lib/auth";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export function LoginWindow() {
   const [error, setError] = useState<string | null>(null);

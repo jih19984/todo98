@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { getPublicEnv } from "@/lib/env";
 import { createOAuthLogin, createSignOut } from "@/lib/auth";
+import { getPublicEnv } from "@/lib/env";
 
 describe("environment config", () => {
   it("returns a setup error when Supabase env vars are missing", () => {

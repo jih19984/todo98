@@ -18,4 +18,10 @@ describe("Home page", () => {
     expect(screen.getByText(/Google로 계속하기/i)).toBeInTheDocument();
     expect(screen.getByText(/Kakao로 계속하기/i)).toBeInTheDocument();
   });
+
+  it("shows OAuth callback errors on the landing page", async () => {
+    render(await Home({ searchParams: Promise.resolve({ auth_error: "OAuth 설정을 확인해주세요." }) }));
+
+    expect(screen.getByText("OAuth 설정을 확인해주세요.")).toBeInTheDocument();
+  });
 });

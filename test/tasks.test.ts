@@ -10,10 +10,10 @@ describe("task validation", () => {
   });
 
   it("accepts a non-empty title and normalizes priority", () => {
-    expect(validateTaskInput({ title: "  도메인 연결  " })).toEqual({
+    expect(validateTaskInput({ title: "  카카오 연결  " })).toEqual({
       ok: true,
       value: {
-        title: "도메인 연결",
+        title: "카카오 연결",
         note: null,
         dueDate: null,
         priority: "normal",

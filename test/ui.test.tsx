@@ -6,11 +6,11 @@ describe("RetroWindow", () => {
   it("renders a window title and content", () => {
     render(
       <RetroWindow title="Today.tasks">
-        <p>할 일 목록</p>
+        <p>작업 목록</p>
       </RetroWindow>,
     );
 
     expect(screen.getByText("Today.tasks")).toBeInTheDocument();
-    expect(screen.getByText("할 일 목록")).toBeInTheDocument();
+    expect(screen.getByText("작업 목록")).toBeInTheDocument();
   });
 });

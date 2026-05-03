@@ -4,8 +4,15 @@ import { RetroWindow } from "@/components/ui/RetroWindow";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createTaskService, type TaskRecord } from "@/lib/tasks";
 
-export default async function Home() {
-  let setupError: string | null = null;
+interface HomeProps {
+  searchParams?: Promise<{
+    auth_error?: string;
+  }>;
+}
+
+export default async function Home({ searchParams }: HomeProps = {}) {
+  const params = await searchParams;
+  let setupError = params?.auth_error ?? null;
   let tasks: TaskRecord[] = [];
 
   try {
@@ -16,7 +23,7 @@ export default async function Home() {
     if (user) {
       const taskResult = await createTaskService(supabase, user.id).listTasks();
       tasks = taskResult.ok ? taskResult.value : [];
-      return <TaskDesktop userEmail={user.email ?? "Todo98 user"} userId={user.id} initialTasks={tasks} />;
+      return <TaskDesktop userEmail={user.email ?? "Todo98 사용자"} userId={user.id} initialTasks={tasks} />;
     }
   } catch (caught) {
     setupError = caught instanceof Error ? caught.message : "Supabase 설정을 확인해주세요.";
