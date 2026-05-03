@@ -43,7 +43,7 @@ describe("OAuth login", () => {
     });
   });
 
-  it("starts Kakao login with nickname-only scope", async () => {
+  it("starts Kakao login with nickname-only OAuth query scope", async () => {
     const signInWithOAuth = vi.fn().mockResolvedValue({ data: {}, error: null });
     const login = createOAuthLogin({ auth: { signInWithOAuth } } as never, "https://todo98.test");
 
@@ -53,7 +53,9 @@ describe("OAuth login", () => {
       provider: "kakao",
       options: {
         redirectTo: "https://todo98.test/auth/callback",
-        scopes: "profile_nickname",
+        queryParams: {
+          scope: "profile_nickname",
+        },
       },
     });
   });

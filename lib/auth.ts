@@ -5,7 +5,7 @@ export type OAuthProvider = "google" | "kakao";
 function getOAuthOptions(provider: OAuthProvider, origin: string) {
   return {
     redirectTo: `${origin}/auth/callback`,
-    ...(provider === "kakao" ? { scopes: "profile_nickname" } : {}),
+    ...(provider === "kakao" ? { queryParams: { scope: "profile_nickname" } } : {}),
   };
 }
 
