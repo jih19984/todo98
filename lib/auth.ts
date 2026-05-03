@@ -16,3 +16,13 @@ export function createOAuthLogin(client: SupabaseClient, origin: string) {
     }
   };
 }
+
+export function createSignOut(client: SupabaseClient) {
+  return async function signOut() {
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+      throw error;
+    }
+  };
+}

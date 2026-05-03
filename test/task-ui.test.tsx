@@ -1,7 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { TaskDesktop } from "@/components/tasks/TaskDesktop";
+
+const signOut = vi.fn().mockResolvedValue({ error: null });
+
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: {
+      signOut,
+    },
+  }),
+}));
 
 describe("TaskDesktop", () => {
   it("adds and completes a local task", async () => {
@@ -17,5 +27,14 @@ describe("TaskDesktop", () => {
     await user.click(screen.getByRole("button", { name: "완료" }));
 
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
+  });
+
+  it("signs out from the account window", async () => {
+    const user = userEvent.setup();
+    render(<TaskDesktop userEmail="me@example.com" initialTasks={[]} />);
+
+    await user.click(screen.getByRole("button", { name: "로그아웃" }));
+
+    expect(signOut).toHaveBeenCalledOnce();
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { getPublicEnv } from "@/lib/env";
-import { createOAuthLogin } from "@/lib/auth";
+import { createOAuthLogin, createSignOut } from "@/lib/auth";
 
 describe("environment config", () => {
   it("returns a setup error when Supabase env vars are missing", () => {
@@ -55,5 +55,16 @@ describe("OAuth login", () => {
         redirectTo: "https://todo98.test/auth/callback",
       },
     });
+  });
+});
+
+describe("sign out", () => {
+  it("signs out through Supabase auth", async () => {
+    const signOut = vi.fn().mockResolvedValue({ error: null });
+    const logout = createSignOut({ auth: { signOut } } as never);
+
+    await logout();
+
+    expect(signOut).toHaveBeenCalledOnce();
   });
 });

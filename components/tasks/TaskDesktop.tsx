@@ -5,6 +5,7 @@ import { TaskEditor } from "@/components/tasks/TaskEditor";
 import { TaskList } from "@/components/tasks/TaskList";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { RetroWindow } from "@/components/ui/RetroWindow";
+import { createSignOut } from "@/lib/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { createTaskService, dateKey, filterTasks, type TaskFilter, type TaskRecord } from "@/lib/tasks";
 
@@ -91,11 +92,24 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
+  async function handleSignOut() {
+    try {
+      setError(null);
+      await createSignOut(createSupabaseBrowserClient())();
+      window.location.assign("/");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "로그아웃하지 못했습니다.");
+    }
+  }
+
   return (
     <main className="desktop-shell task-desktop">
       <RetroWindow title="User.ini" className="account-window">
         <p className="eyebrow">Signed in</p>
         <p>{userEmail}</p>
+        <RetroButton type="button" onClick={() => void handleSignOut()}>
+          로그아웃
+        </RetroButton>
       </RetroWindow>
       <RetroWindow title="Today.tasks" className="tasks-window">
         <div className="task-toolbar">
