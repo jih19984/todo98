@@ -61,7 +61,6 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
             </span>
             {task.note && <p className="task-note">{task.note}</p>}
           </div>
-          {task.due_date && <small className="task-chip task-date-chip">{task.due_date}</small>}
           <div className="task-row-actions">
             {onEdit && (
               <RetroButton type="button" aria-label={`${task.title} 수정`} onClick={() => onEdit(task)}>

@@ -135,7 +135,7 @@ describe("TaskDesktop", () => {
 
     expect(screen.getByText("Lazyweb 레퍼런스 반영")).toBeInTheDocument();
     expect(screen.getByText("Any.do와 Sunsama 참고")).toBeInTheDocument();
-    expect(screen.getByText("2026-05-05")).toBeInTheDocument();
+    expect(screen.queryByText("2026-05-05")).not.toBeInTheDocument();
     const priorityIcon = screen.getByLabelText("우선순위 높음");
     expect(priorityIcon).toBeInTheDocument();
     expect(priorityIcon.querySelectorAll(".priority-bar")).toHaveLength(3);
@@ -150,18 +150,15 @@ describe("TaskDesktop", () => {
     const user = userEvent.setup();
     render(<TaskDesktop userEmail="me@example.com" initialTasks={[]} />);
 
-    const visibleToday = (screen.getByLabelText("마감일") as HTMLInputElement).value;
+    expect(screen.queryByLabelText("마감일")).not.toBeInTheDocument();
 
     await user.type(screen.getByLabelText("할 일 제목"), "도메인 구매하기");
     await user.type(screen.getByLabelText("메모"), "Vercel 연결 전에 후보 확인");
-    await user.clear(screen.getByLabelText("마감일"));
-    await user.type(screen.getByLabelText("마감일"), visibleToday);
     await user.selectOptions(screen.getByLabelText("우선순위"), "high");
     await user.click(screen.getByRole("button", { name: "추가" }));
 
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
     expect(screen.getByText("Vercel 연결 전에 후보 확인")).toBeInTheDocument();
-    expect(screen.getByText(visibleToday)).toBeInTheDocument();
     expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "도메인 구매하기 완료" }));

@@ -14,29 +14,26 @@ interface TaskEditorProps {
 }
 
 export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }: TaskEditorProps) {
-  const defaultDueDate = mode === "create" ? dateKey(new Date()) : "";
   const [title, setTitle] = useState(initialTask?.title ?? "");
   const [note, setNote] = useState(initialTask?.note ?? "");
-  const [dueDate, setDueDate] = useState(initialTask?.due_date ?? defaultDueDate);
   const [priority, setPriority] = useState<TaskPriority>(initialTask?.priority ?? "normal");
 
   useEffect(() => {
     setTitle(initialTask?.title ?? "");
     setNote(initialTask?.note ?? "");
-    setDueDate(initialTask?.due_date ?? (mode === "create" ? dateKey(new Date()) : ""));
     setPriority(initialTask?.priority ?? "normal");
-  }, [initialTask, mode]);
+  }, [initialTask]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const clean = title.trim();
     if (!clean) return;
+    const dueDate = mode === "create" ? dateKey(new Date()) : (initialTask?.due_date ?? null);
     onSubmit({ title: clean, note, dueDate, priority });
 
     if (mode === "create") {
       setTitle("");
       setNote("");
-      setDueDate(dateKey(new Date()));
       setPriority("normal");
     }
   }
@@ -47,15 +44,6 @@ export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }:
         <label className="task-editor-field" htmlFor="task-title">
           할 일 제목
           <RetroInput id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
-        </label>
-        <label className="task-editor-field" htmlFor="task-due-date">
-          마감일
-          <RetroInput
-            id="task-due-date"
-            type="date"
-            value={dueDate}
-            onChange={(event) => setDueDate(event.target.value)}
-          />
         </label>
         <label className="task-editor-field" htmlFor="task-priority">
           우선순위
