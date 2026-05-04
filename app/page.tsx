@@ -45,18 +45,7 @@ export default async function Home({ searchParams }: HomeProps = {}) {
 
         <div className="landing-copy-stack">
           <RetroWindow title="Todo98">
-            <p className="eyebrow">Retro OS Todo</p>
             <h1>Todo98</h1>
-            <p className="hero-copy">
-              오늘 할 일을 가볍게 적고, 체크하고, 저장하는 개인 TODO 앱입니다. Google 또는 Kakao로
-              로그인하고 나만의 `Today.tasks`를 열어보세요.
-            </p>
-            <div className="todo-preview" aria-label="Todo98 미리보기">
-              <p>Today.tasks</p>
-              <span>□ 오늘 할 일 적기</span>
-              <span>□ 로그인 연결 확인</span>
-              <span>✓ 첫 배포 완료</span>
-            </div>
           </RetroWindow>
 
           <LoginWindow />

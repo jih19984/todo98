@@ -21,7 +21,6 @@ export function LoginWindow() {
 
   return (
     <RetroWindow title="Login.exe" className="login-window">
-      <p className="window-copy">Google 또는 Kakao 계정으로 Todo98을 시작하세요.</p>
       <div className="login-actions">
         <RetroButton type="button" onClick={() => void handleLogin("google")}>
           Google로 계속하기

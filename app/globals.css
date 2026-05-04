@@ -166,35 +166,9 @@ textarea {
   text-transform: uppercase;
 }
 
-.hero-copy,
-.window-copy {
-  line-height: 1.6;
-}
-
-.login-actions,
-.todo-preview {
+.login-actions {
   display: grid;
   gap: 10px;
-}
-
-.todo-preview {
-  margin-top: 20px;
-  padding: 12px;
-  border: 2px solid var(--ink);
-  background: #fffdf7;
-  box-shadow: 3px 3px 0 var(--shadow);
-  font-weight: 900;
-}
-
-.todo-preview p {
-  margin: 0 0 2px;
-  color: #565656;
-  font-size: 12px;
-  text-transform: uppercase;
-}
-
-.todo-preview span {
-  display: block;
 }
 
 .setup-window {
