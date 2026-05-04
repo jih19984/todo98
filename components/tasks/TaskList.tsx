@@ -1,7 +1,19 @@
 "use client";
 
 import { RetroButton } from "@/components/ui/RetroButton";
-import type { TaskRecord } from "@/lib/tasks";
+import type { TaskPriority, TaskRecord } from "@/lib/tasks";
+
+const priorityMarks: Record<TaskPriority, string> = {
+  low: "^",
+  normal: "^^",
+  high: "^^^",
+};
+
+const priorityLabels: Record<TaskPriority, string> = {
+  low: "낮음",
+  normal: "보통",
+  high: "높음",
+};
 
 interface TaskListProps {
   tasks: TaskRecord[];
@@ -40,7 +52,9 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
             {task.note && <p className="task-note">{task.note}</p>}
             <div className="task-meta">
               {task.due_date && <small className="task-chip">{task.due_date}</small>}
-              <small className="task-chip">{task.priority.toUpperCase()}</small>
+              <small className="task-chip task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
+                {priorityMarks[task.priority]}
+              </small>
             </div>
           </div>
           {onEdit && (

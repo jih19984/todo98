@@ -338,6 +338,12 @@ textarea {
   font-weight: 900;
 }
 
+.task-priority-chip {
+  min-width: 32px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
 .empty-task {
   display: grid;
   gap: 4px;
