@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronUp } from "lucide-react";
 import { RetroButton } from "@/components/ui/RetroButton";
 import type { TaskPriority, TaskRecord } from "@/lib/tasks";
 
@@ -55,7 +56,7 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
               <small className="task-chip task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
                 <span className="priority-mark-stack" aria-hidden="true">
                   {Array.from({ length: priorityLevels[task.priority] }, (_, index) => (
-                    <span className="priority-mark" key={index} />
+                    <ChevronUp className="priority-mark" key={index} strokeWidth={3} />
                   ))}
                 </span>
               </small>
