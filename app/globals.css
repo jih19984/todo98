@@ -352,19 +352,46 @@ textarea {
 }
 
 .task-priority-chip {
-  width: 18px;
-  height: 18px;
-  display: inline-grid;
-  place-items: center;
+  width: 19px;
+  height: 16px;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
   padding: 0;
   flex: 0 0 auto;
   color: var(--ink);
 }
 
-.priority-mark {
-  width: 17px;
-  height: 17px;
+.priority-bar {
+  width: 4px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  box-shadow: 1px 1px 0 var(--shadow);
   display: block;
+}
+
+.priority-low .priority-bar {
+  height: 6px;
+}
+
+.priority-normal .priority-bar:first-child {
+  height: 6px;
+}
+
+.priority-normal .priority-bar:last-child {
+  height: 10px;
+}
+
+.priority-high .priority-bar:nth-child(1) {
+  height: 6px;
+}
+
+.priority-high .priority-bar:nth-child(2) {
+  height: 10px;
+}
+
+.priority-high .priority-bar:nth-child(3) {
+  height: 14px;
 }
 
 .task-row-actions {

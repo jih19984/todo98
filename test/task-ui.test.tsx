@@ -136,7 +136,9 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("Lazyweb 레퍼런스 반영")).toBeInTheDocument();
     expect(screen.getByText("Any.do와 Sunsama 참고")).toBeInTheDocument();
     expect(screen.getByText("2026-05-05")).toBeInTheDocument();
-    expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
+    const priorityIcon = screen.getByLabelText("우선순위 높음");
+    expect(priorityIcon).toBeInTheDocument();
+    expect(priorityIcon.querySelectorAll(".priority-bar")).toHaveLength(3);
 
     await user.click(screen.getByRole("button", { name: "완료" }));
 
