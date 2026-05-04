@@ -185,15 +185,23 @@ textarea {
 
 .task-editor-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px 150px;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(172px, 0.34fr) minmax(164px, 0.3fr);
+  column-gap: 16px;
+  row-gap: 12px;
   align-items: end;
 }
 
 .task-editor-field {
   display: grid;
   gap: 6px;
+  min-width: 0;
   font-weight: 900;
+}
+
+.task-editor-compact-field {
+  padding: 8px;
+  border: 2px solid rgba(17, 17, 17, 0.18);
+  background: #fffdf7;
 }
 
 .task-editor-note {
