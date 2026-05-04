@@ -45,6 +45,16 @@ export default async function Home({ searchParams }: HomeProps = {}) {
 
           <LoginWindow />
         </div>
+        <div className="landing-character-stage" aria-hidden="true">
+          <img
+            className="landing-character"
+            src="/animations/todo98-character.webp"
+            alt=""
+            width="360"
+            height="674"
+            loading="eager"
+          />
+        </div>
 
         {setupError && (
           <RetroWindow title="Setup.txt" className="setup-window">

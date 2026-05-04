@@ -120,20 +120,40 @@ textarea {
 
 .landing-grid {
   display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(220px, 360px);
+  gap: 42px;
+  align-items: center;
+  justify-content: center;
   min-height: calc(100vh - 64px);
-  place-items: center;
 }
 
 .landing-copy-stack {
   width: min(440px, 100%);
   display: grid;
   gap: 18px;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-copy-stack h1 {
   margin: 0 0 12px;
   font-size: clamp(52px, 9vw, 116px);
   line-height: 0.9;
+}
+
+.landing-character-stage {
+  display: grid;
+  place-items: end center;
+  min-width: 0;
+  align-self: end;
+}
+
+.landing-character {
+  width: min(360px, 34vw);
+  height: auto;
+  display: block;
+  filter: drop-shadow(7px 9px 0 rgba(17, 17, 17, 0.22));
+  pointer-events: none;
 }
 
 .eyebrow {
@@ -399,6 +419,22 @@ textarea {
 }
 
 @media (max-width: 820px) {
+  .landing-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    align-content: center;
+  }
+
+  .landing-character-stage {
+    order: -1;
+    max-height: 220px;
+    overflow: hidden;
+  }
+
+  .landing-character {
+    width: min(230px, 58vw);
+  }
+
   .account-window {
     width: 100%;
     margin-bottom: 14px;
