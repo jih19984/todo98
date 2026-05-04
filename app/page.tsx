@@ -1,5 +1,4 @@
 import { LoginWindow } from "@/components/auth/LoginWindow";
-import { RiveHero } from "@/components/landing/RiveHero";
 import { TaskDesktop } from "@/components/tasks/TaskDesktop";
 import { RetroWindow } from "@/components/ui/RetroWindow";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -39,10 +38,6 @@ export default async function Home({ searchParams }: HomeProps = {}) {
   return (
     <main className="desktop-shell landing-shell">
       <section className="landing-grid">
-        <RetroWindow title="CloudyWalk.riv" className="animation-window">
-          <RiveHero />
-        </RetroWindow>
-
         <div className="landing-copy-stack">
           <RetroWindow title="Todo98">
             <h1>Todo98</h1>
