@@ -267,7 +267,7 @@ textarea {
 .task-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
+  align-items: start;
   gap: 10px;
   padding: 10px;
   border: 2px solid var(--ink);
@@ -303,7 +303,7 @@ textarea {
   gap: 6px;
 }
 
-.task-row small {
+.task-chip {
   padding: 4px 7px;
   border: 1px solid var(--ink);
   background: var(--mint);
@@ -311,8 +311,11 @@ textarea {
 }
 
 .empty-task {
+  display: grid;
+  gap: 4px;
   padding: 18px;
   border: 2px dashed var(--ink);
+  background: #fffdf7;
 }
 
 @media (max-width: 820px) {
@@ -331,6 +334,11 @@ textarea {
   }
 
   .task-row {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .task-row > .retro-button:last-child,
+  .task-row > .retro-button:nth-last-child(2) {
+    grid-column: span 1;
   }
 }
