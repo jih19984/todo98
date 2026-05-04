@@ -79,6 +79,37 @@ describe("TaskDesktop", () => {
     expect(screen.queryByText("버릴 제목")).not.toBeInTheDocument();
   });
 
+  it("clears edit mode when deleting the task being edited", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "삭제할 제목",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "전체" }));
+    await user.click(screen.getByRole("button", { name: "삭제할 제목 수정" }));
+    expect(screen.getByRole("button", { name: "수정 저장" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "삭제할 제목 삭제" }));
+
+    expect(screen.getByRole("button", { name: "추가" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "수정 저장" })).not.toBeInTheDocument();
+  });
+
   it("shows task metadata and an empty state", async () => {
     const user = userEvent.setup();
     render(

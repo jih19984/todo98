@@ -142,6 +142,9 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
     }
 
     setError(null);
+    if (editingTask?.id === id) {
+      setEditingTask(null);
+    }
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
