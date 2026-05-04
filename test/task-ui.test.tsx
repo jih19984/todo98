@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { TaskDesktop } from "@/components/tasks/TaskDesktop";
@@ -162,8 +162,7 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
   });
 
-  it("reorders visible tasks", async () => {
-    const user = userEvent.setup();
+  it("reorders visible tasks by dragging a task row", () => {
     render(
       <TaskDesktop
         userEmail="me@example.com"
@@ -195,9 +194,28 @@ describe("TaskDesktop", () => {
     );
 
     const list = screen.getByRole("list");
-    expect(list.querySelectorAll("li")[0]).toHaveTextContent("첫 번째");
+    const firstTask = screen.getByText("첫 번째").closest("li");
+    const secondTask = screen.getByText("두 번째").closest("li");
+    const dataTransfer = {
+      data: {} as Record<string, string>,
+      dropEffect: "",
+      effectAllowed: "",
+      setData(format: string, value: string) {
+        this.data[format] = value;
+      },
+      getData(format: string) {
+        return this.data[format];
+      },
+    };
 
-    await user.click(screen.getByRole("button", { name: "두 번째 위로 이동" }));
+    expect(firstTask).not.toBeNull();
+    expect(secondTask).not.toBeNull();
+    expect(list.querySelectorAll("li")[0]).toHaveTextContent("첫 번째");
+    expect(screen.queryByRole("button", { name: "두 번째 위로 이동" })).not.toBeInTheDocument();
+
+    fireEvent.dragStart(secondTask as HTMLLIElement, { dataTransfer });
+    fireEvent.dragOver(firstTask as HTMLLIElement, { dataTransfer });
+    fireEvent.drop(firstTask as HTMLLIElement, { dataTransfer });
 
     expect(list.querySelectorAll("li")[0]).toHaveTextContent("두 번째");
   });

@@ -8,10 +8,10 @@ interface TaskListProps {
   onToggle: (id: string) => void | Promise<void>;
   onEdit?: (task: TaskRecord) => void;
   onDelete: (id: string) => void | Promise<void>;
-  onMove?: (id: string, direction: "up" | "down") => void;
+  onReorder?: (draggedId: string, targetId: string) => void;
 }
 
-export function TaskList({ tasks, onToggle, onEdit, onDelete, onMove }: TaskListProps) {
+export function TaskList({ tasks, onToggle, onEdit, onDelete, onReorder }: TaskListProps) {
   if (tasks.length === 0) {
     return (
       <div className="empty-task">
@@ -23,30 +23,29 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete, onMove }: TaskList
 
   return (
     <ul className="task-list">
-      {tasks.map((task, index) => (
-        <li className={task.completed_at ? "task-row completed" : "task-row"} key={task.id}>
-          {onMove && (
-            <div className="task-move-actions" aria-label={`${task.title} 순서 변경`}>
-              <button
-                className="task-move-button"
-                type="button"
-                aria-label={`${task.title} 위로 이동`}
-                disabled={index === 0}
-                onClick={() => onMove(task.id, "up")}
-              >
-                ▲
-              </button>
-              <button
-                className="task-move-button"
-                type="button"
-                aria-label={`${task.title} 아래로 이동`}
-                disabled={index === tasks.length - 1}
-                onClick={() => onMove(task.id, "down")}
-              >
-                ▼
-              </button>
-            </div>
-          )}
+      {tasks.map((task) => (
+        <li
+          className={task.completed_at ? "task-row completed" : "task-row"}
+          draggable={Boolean(onReorder)}
+          key={task.id}
+          onDragStart={(event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", task.id);
+          }}
+          onDragOver={(event) => {
+            if (!onReorder) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+          }}
+          onDrop={(event) => {
+            if (!onReorder) return;
+            event.preventDefault();
+            const draggedId = event.dataTransfer.getData("text/plain");
+            if (draggedId && draggedId !== task.id) {
+              onReorder(draggedId, task.id);
+            }
+          }}
+        >
           <button
             className="task-check-button"
             type="button"

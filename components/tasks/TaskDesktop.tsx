@@ -29,26 +29,18 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   const [error, setError] = useState<string | null>(null);
   const visibleTasks = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
 
-  function moveTask(id: string, direction: "up" | "down") {
-    const visibleIds = visibleTasks.map((task) => task.id);
-    const visibleIndex = visibleIds.indexOf(id);
-    const targetVisibleIndex = direction === "up" ? visibleIndex - 1 : visibleIndex + 1;
-
-    if (visibleIndex < 0 || targetVisibleIndex < 0 || targetVisibleIndex >= visibleIds.length) {
-      return;
-    }
-
-    const targetId = visibleIds[targetVisibleIndex];
+  function reorderTask(draggedId: string, targetId: string) {
     setTasks((current) => {
       const next = [...current];
-      const sourceIndex = next.findIndex((task) => task.id === id);
+      const sourceIndex = next.findIndex((task) => task.id === draggedId);
       const targetIndex = next.findIndex((task) => task.id === targetId);
 
-      if (sourceIndex < 0 || targetIndex < 0) {
+      if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) {
         return current;
       }
 
-      [next[sourceIndex], next[targetIndex]] = [next[targetIndex], next[sourceIndex]];
+      const [draggedTask] = next.splice(sourceIndex, 1);
+      next.splice(targetIndex, 0, draggedTask);
       return next;
     });
   }
@@ -236,7 +228,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
           onToggle={toggleTask}
           onEdit={setEditingTask}
           onDelete={deleteTask}
-          onMove={moveTask}
+          onReorder={reorderTask}
         />
       </RetroWindow>
     </main>
