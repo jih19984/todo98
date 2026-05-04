@@ -3,10 +3,10 @@
 import { RetroButton } from "@/components/ui/RetroButton";
 import type { TaskPriority, TaskRecord } from "@/lib/tasks";
 
-const priorityMarks: Record<TaskPriority, string> = {
-  low: "^",
-  normal: "^^",
-  high: "^^^",
+const priorityLevels: Record<TaskPriority, number> = {
+  low: 1,
+  normal: 2,
+  high: 3,
 };
 
 const priorityLabels: Record<TaskPriority, string> = {
@@ -53,7 +53,11 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
             <div className="task-meta">
               {task.due_date && <small className="task-chip">{task.due_date}</small>}
               <small className="task-chip task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
-                {priorityMarks[task.priority]}
+                <span className="priority-mark-stack" aria-hidden="true">
+                  {Array.from({ length: priorityLevels[task.priority] }, (_, index) => (
+                    <span className="priority-mark" key={index} />
+                  ))}
+                </span>
               </small>
             </div>
           </div>

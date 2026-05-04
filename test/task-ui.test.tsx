@@ -45,7 +45,7 @@ describe("TaskDesktop", () => {
 
     expect(screen.getByText("수정된 할 일")).toBeInTheDocument();
     expect(screen.getByText("편집 메모")).toBeInTheDocument();
-    expect(screen.getByText("^^^")).toBeInTheDocument();
+    expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
   });
 
   it("cancels editing without changing the task", async () => {
@@ -136,7 +136,7 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("Lazyweb 레퍼런스 반영")).toBeInTheDocument();
     expect(screen.getByText("Any.do와 Sunsama 참고")).toBeInTheDocument();
     expect(screen.getByText("2026-05-05")).toBeInTheDocument();
-    expect(screen.getByText("^^^")).toBeInTheDocument();
+    expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "완료" }));
 
@@ -160,7 +160,7 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
     expect(screen.getByText("Vercel 연결 전에 후보 확인")).toBeInTheDocument();
     expect(screen.getByText(visibleToday)).toBeInTheDocument();
-    expect(screen.getByText("^^^")).toBeInTheDocument();
+    expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "도메인 구매하기 완료" }));
     await user.click(screen.getByRole("button", { name: "완료" }));

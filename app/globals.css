@@ -339,9 +339,24 @@ textarea {
 }
 
 .task-priority-chip {
-  min-width: 32px;
-  text-align: center;
-  letter-spacing: 1px;
+  min-width: 30px;
+  min-height: 24px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.priority-mark-stack {
+  display: inline-grid;
+  gap: 1px;
+  place-items: center;
+}
+
+.priority-mark {
+  width: 11px;
+  height: 7px;
+  border-top: 2px solid var(--ink);
+  border-left: 2px solid var(--ink);
+  transform: rotate(45deg);
 }
 
 .empty-task {
