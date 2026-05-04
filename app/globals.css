@@ -138,7 +138,7 @@ textarea {
 
 .rive-hero {
   width: 100%;
-  min-height: clamp(360px, 54vw, 610px);
+  height: clamp(360px, 54vw, 610px);
   overflow: hidden;
   background:
     linear-gradient(rgba(17, 17, 17, 0.04) 1px, transparent 1px),
@@ -147,8 +147,11 @@ textarea {
   background-size: 22px 22px;
 }
 
+.rive-hero > div,
 .rive-hero canvas {
   display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .eyebrow {
@@ -278,7 +281,7 @@ textarea {
   }
 
   .rive-hero {
-    min-height: 330px;
+    height: 330px;
   }
 
   .task-row {
