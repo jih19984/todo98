@@ -48,7 +48,7 @@ export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }:
           할 일 제목
           <RetroInput id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
         </label>
-        <label className="task-editor-field task-editor-compact-field" htmlFor="task-due-date">
+        <label className="task-editor-field" htmlFor="task-due-date">
           마감일
           <RetroInput
             id="task-due-date"
@@ -57,7 +57,7 @@ export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }:
             onChange={(event) => setDueDate(event.target.value)}
           />
         </label>
-        <label className="task-editor-field task-editor-compact-field" htmlFor="task-priority">
+        <label className="task-editor-field" htmlFor="task-priority">
           우선순위
           <RetroSelect
             id="task-priority"
