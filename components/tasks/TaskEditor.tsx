@@ -3,8 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { RetroInput } from "@/components/ui/RetroInput";
-import { RetroSelect } from "@/components/ui/RetroSelect";
-import { dateKey, type TaskInput, type TaskPriority, type TaskRecord } from "@/lib/tasks";
+import { dateKey, type TaskInput, type TaskRecord } from "@/lib/tasks";
 
 interface TaskEditorProps {
   mode?: "create" | "edit";
@@ -16,12 +15,10 @@ interface TaskEditorProps {
 export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }: TaskEditorProps) {
   const [title, setTitle] = useState(initialTask?.title ?? "");
   const [note, setNote] = useState(initialTask?.note ?? "");
-  const [priority, setPriority] = useState<TaskPriority>(initialTask?.priority ?? "normal");
 
   useEffect(() => {
     setTitle(initialTask?.title ?? "");
     setNote(initialTask?.note ?? "");
-    setPriority(initialTask?.priority ?? "normal");
   }, [initialTask]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -29,12 +26,11 @@ export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }:
     const clean = title.trim();
     if (!clean) return;
     const dueDate = mode === "create" ? dateKey(new Date()) : (initialTask?.due_date ?? null);
-    onSubmit({ title: clean, note, dueDate, priority });
+    onSubmit({ title: clean, note, dueDate, priority: "normal" });
 
     if (mode === "create") {
       setTitle("");
       setNote("");
-      setPriority("normal");
     }
   }
 
@@ -44,18 +40,6 @@ export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }:
         <label className="task-editor-field" htmlFor="task-title">
           할 일 제목
           <RetroInput id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
-        </label>
-        <label className="task-editor-field" htmlFor="task-priority">
-          우선순위
-          <RetroSelect
-            id="task-priority"
-            value={priority}
-            onChange={(event) => setPriority(event.target.value as TaskPriority)}
-          >
-            <option value="low">낮음</option>
-            <option value="normal">보통</option>
-            <option value="high">높음</option>
-          </RetroSelect>
         </label>
         <label className="task-editor-field task-editor-note" htmlFor="task-note">
           메모

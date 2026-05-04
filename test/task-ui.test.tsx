@@ -40,12 +40,10 @@ describe("TaskDesktop", () => {
     await user.clear(screen.getByLabelText("할 일 제목"));
     await user.type(screen.getByLabelText("할 일 제목"), "수정된 할 일");
     await user.type(screen.getByLabelText("메모"), "편집 메모");
-    await user.selectOptions(screen.getByLabelText("우선순위"), "high");
     await user.click(screen.getByRole("button", { name: "수정 저장" }));
 
     expect(screen.getByText("수정된 할 일")).toBeInTheDocument();
     expect(screen.getByText("편집 메모")).toBeInTheDocument();
-    expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
   });
 
   it("cancels editing without changing the task", async () => {
@@ -136,9 +134,7 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("Lazyweb 레퍼런스 반영")).toBeInTheDocument();
     expect(screen.getByText("Any.do와 Sunsama 참고")).toBeInTheDocument();
     expect(screen.queryByText("2026-05-05")).not.toBeInTheDocument();
-    const priorityIcon = screen.getByLabelText("우선순위 높음");
-    expect(priorityIcon).toBeInTheDocument();
-    expect(priorityIcon.querySelectorAll(".priority-bar")).toHaveLength(3);
+    expect(screen.queryByLabelText("우선순위 높음")).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "완료" }));
 
@@ -154,17 +150,56 @@ describe("TaskDesktop", () => {
 
     await user.type(screen.getByLabelText("할 일 제목"), "도메인 구매하기");
     await user.type(screen.getByLabelText("메모"), "Vercel 연결 전에 후보 확인");
-    await user.selectOptions(screen.getByLabelText("우선순위"), "high");
+    expect(screen.queryByLabelText("우선순위")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "추가" }));
 
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
     expect(screen.getByText("Vercel 연결 전에 후보 확인")).toBeInTheDocument();
-    expect(screen.getByLabelText("우선순위 높음")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "도메인 구매하기 완료" }));
     await user.click(screen.getByRole("button", { name: "완료" }));
 
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
+  });
+
+  it("reorders visible tasks", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "첫 번째",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+          {
+            id: "task-2",
+            user_id: "local",
+            title: "두 번째",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    const list = screen.getByRole("list");
+    expect(list.querySelectorAll("li")[0]).toHaveTextContent("첫 번째");
+
+    await user.click(screen.getByRole("button", { name: "두 번째 위로 이동" }));
+
+    expect(list.querySelectorAll("li")[0]).toHaveTextContent("두 번째");
   });
 
   it("signs out from the account window", async () => {

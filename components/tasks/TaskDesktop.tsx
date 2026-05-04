@@ -29,6 +29,30 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   const [error, setError] = useState<string | null>(null);
   const visibleTasks = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
 
+  function moveTask(id: string, direction: "up" | "down") {
+    const visibleIds = visibleTasks.map((task) => task.id);
+    const visibleIndex = visibleIds.indexOf(id);
+    const targetVisibleIndex = direction === "up" ? visibleIndex - 1 : visibleIndex + 1;
+
+    if (visibleIndex < 0 || targetVisibleIndex < 0 || targetVisibleIndex >= visibleIds.length) {
+      return;
+    }
+
+    const targetId = visibleIds[targetVisibleIndex];
+    setTasks((current) => {
+      const next = [...current];
+      const sourceIndex = next.findIndex((task) => task.id === id);
+      const targetIndex = next.findIndex((task) => task.id === targetId);
+
+      if (sourceIndex < 0 || targetIndex < 0) {
+        return current;
+      }
+
+      [next[sourceIndex], next[targetIndex]] = [next[targetIndex], next[sourceIndex]];
+      return next;
+    });
+  }
+
   async function addTask(input: TaskInput) {
     const now = new Date().toISOString();
     const localTask = {
@@ -207,7 +231,13 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
           onCancel={editingTask ? () => setEditingTask(null) : undefined}
         />
         {error && <p className="retro-error">{error}</p>}
-        <TaskList tasks={visibleTasks} onToggle={toggleTask} onEdit={setEditingTask} onDelete={deleteTask} />
+        <TaskList
+          tasks={visibleTasks}
+          onToggle={toggleTask}
+          onEdit={setEditingTask}
+          onDelete={deleteTask}
+          onMove={moveTask}
+        />
       </RetroWindow>
     </main>
   );

@@ -1,28 +1,17 @@
 "use client";
 
 import { RetroButton } from "@/components/ui/RetroButton";
-import type { TaskPriority, TaskRecord } from "@/lib/tasks";
-
-const priorityLevels: Record<TaskPriority, number> = {
-  low: 1,
-  normal: 2,
-  high: 3,
-};
-
-const priorityLabels: Record<TaskPriority, string> = {
-  low: "낮음",
-  normal: "보통",
-  high: "높음",
-};
+import type { TaskRecord } from "@/lib/tasks";
 
 interface TaskListProps {
   tasks: TaskRecord[];
   onToggle: (id: string) => void | Promise<void>;
   onEdit?: (task: TaskRecord) => void;
   onDelete: (id: string) => void | Promise<void>;
+  onMove?: (id: string, direction: "up" | "down") => void;
 }
 
-export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
+export function TaskList({ tasks, onToggle, onEdit, onDelete, onMove }: TaskListProps) {
   if (tasks.length === 0) {
     return (
       <div className="empty-task">
@@ -34,8 +23,30 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
 
   return (
     <ul className="task-list">
-      {tasks.map((task) => (
+      {tasks.map((task, index) => (
         <li className={task.completed_at ? "task-row completed" : "task-row"} key={task.id}>
+          {onMove && (
+            <div className="task-move-actions" aria-label={`${task.title} 순서 변경`}>
+              <button
+                className="task-move-button"
+                type="button"
+                aria-label={`${task.title} 위로 이동`}
+                disabled={index === 0}
+                onClick={() => onMove(task.id, "up")}
+              >
+                ▲
+              </button>
+              <button
+                className="task-move-button"
+                type="button"
+                aria-label={`${task.title} 아래로 이동`}
+                disabled={index === tasks.length - 1}
+                onClick={() => onMove(task.id, "down")}
+              >
+                ▼
+              </button>
+            </div>
+          )}
           <button
             className="task-check-button"
             type="button"
@@ -48,17 +59,7 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
             </span>
           </button>
           <div className="task-main">
-            <span className="task-title-line">
-              {task.title}
-              <small
-                className={`task-priority-chip priority-${task.priority}`}
-                aria-label={`우선순위 ${priorityLabels[task.priority]}`}
-              >
-                {Array.from({ length: priorityLevels[task.priority] }, (_, index) => (
-                  <span className="priority-bar" key={index} aria-hidden="true" />
-                ))}
-              </small>
-            </span>
+            <span className="task-title-line">{task.title}</span>
             {task.note && <p className="task-note">{task.note}</p>}
           </div>
           <div className="task-row-actions">
