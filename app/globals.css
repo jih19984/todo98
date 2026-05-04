@@ -224,14 +224,36 @@ textarea {
 
 .task-editor {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
   margin-bottom: 18px;
 }
 
-.task-editor label {
-  grid-column: 1 / -1;
+.task-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px 150px;
+  gap: 10px;
+  align-items: end;
+}
+
+.task-editor-field {
+  display: grid;
+  gap: 6px;
   font-weight: 900;
+}
+
+.task-editor-note {
+  grid-column: 1 / -1;
+}
+
+.retro-textarea {
+  min-height: 76px;
+  padding-top: 8px;
+  resize: vertical;
+}
+
+.task-editor-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .task-list {
@@ -257,6 +279,30 @@ textarea {
   opacity: 0.6;
 }
 
+.task-main {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.task-title-line {
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.task-note {
+  margin: 0;
+  color: #565656;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .task-row small {
   padding: 4px 7px;
   border: 1px solid var(--ink);
@@ -276,7 +322,7 @@ textarea {
   }
 
   .task-toolbar,
-  .task-editor {
+  .task-editor-grid {
     grid-template-columns: 1fr;
   }
 
@@ -285,6 +331,6 @@ textarea {
   }
 
   .task-row {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 }

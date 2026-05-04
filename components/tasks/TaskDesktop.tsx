@@ -7,7 +7,7 @@ import { RetroButton } from "@/components/ui/RetroButton";
 import { RetroWindow } from "@/components/ui/RetroWindow";
 import { createSignOut } from "@/lib/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { createTaskService, dateKey, filterTasks, type TaskFilter, type TaskRecord } from "@/lib/tasks";
+import { createTaskService, filterTasks, type TaskFilter, type TaskInput, type TaskRecord } from "@/lib/tasks";
 
 interface TaskDesktopProps {
   userEmail: string;
@@ -21,15 +21,15 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   const [error, setError] = useState<string | null>(null);
   const visibleTasks = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
 
-  async function addTask(title: string) {
+  async function addTask(input: TaskInput) {
     const now = new Date().toISOString();
     const localTask = {
       id: crypto.randomUUID(),
       user_id: userId ?? "local",
-      title,
-      note: null,
-      due_date: dateKey(new Date()),
-      priority: "normal" as const,
+      title: input.title.trim(),
+      note: input.note?.trim() || null,
+      due_date: input.dueDate || null,
+      priority: input.priority || "normal",
       completed_at: null,
       created_at: now,
       updated_at: now,
@@ -41,8 +41,10 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
     }
 
     const result = await createTaskService(createSupabaseBrowserClient(), userId).createTask({
-      title,
-      dueDate: localTask.due_date,
+      title: input.title,
+      note: input.note,
+      dueDate: input.dueDate,
+      priority: input.priority,
     });
 
     if (!result.ok) {
@@ -129,7 +131,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
             </RetroButton>
           </div>
         </div>
-        <TaskEditor onAdd={(title) => void addTask(title)} />
+        <TaskEditor onSubmit={(input) => void addTask(input)} />
         {error && <p className="retro-error">{error}</p>}
         <TaskList tasks={visibleTasks} onToggle={toggleTask} onDelete={deleteTask} />
       </RetroWindow>

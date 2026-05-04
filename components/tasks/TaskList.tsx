@@ -25,8 +25,14 @@ export function TaskList({ tasks, onToggle, onDelete }: TaskListProps) {
           >
             {task.completed_at ? "✓" : "□"}
           </RetroButton>
-          <span>{task.title}</span>
-          <small>{task.priority.toUpperCase()}</small>
+          <div className="task-main">
+            <span className="task-title-line">{task.title}</span>
+            {task.note && <p className="task-note">{task.note}</p>}
+            <div className="task-meta">
+              {task.due_date && <small>{task.due_date}</small>}
+              <small>{task.priority.toUpperCase()}</small>
+            </div>
+          </div>
           <RetroButton type="button" aria-label={`${task.title} 삭제`} onClick={() => void onDelete(task.id)}>
             삭제
           </RetroButton>
