@@ -14,6 +14,71 @@ vi.mock("@/lib/supabase/browser", () => ({
 }));
 
 describe("TaskDesktop", () => {
+  it("edits a local task", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "초안",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "전체" }));
+    await user.click(screen.getByRole("button", { name: "초안 수정" }));
+    await user.clear(screen.getByLabelText("할 일 제목"));
+    await user.type(screen.getByLabelText("할 일 제목"), "수정된 할 일");
+    await user.type(screen.getByLabelText("메모"), "편집 메모");
+    await user.selectOptions(screen.getByLabelText("우선순위"), "high");
+    await user.click(screen.getByRole("button", { name: "수정 저장" }));
+
+    expect(screen.getByText("수정된 할 일")).toBeInTheDocument();
+    expect(screen.getByText("편집 메모")).toBeInTheDocument();
+    expect(screen.getByText("HIGH")).toBeInTheDocument();
+  });
+
+  it("cancels editing without changing the task", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "유지할 제목",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "전체" }));
+    await user.click(screen.getByRole("button", { name: "유지할 제목 수정" }));
+    await user.clear(screen.getByLabelText("할 일 제목"));
+    await user.type(screen.getByLabelText("할 일 제목"), "버릴 제목");
+    await user.click(screen.getByRole("button", { name: "취소" }));
+
+    expect(screen.getByText("유지할 제목")).toBeInTheDocument();
+    expect(screen.queryByText("버릴 제목")).not.toBeInTheDocument();
+  });
+
   it("shows task metadata and an empty state", async () => {
     const user = userEvent.setup();
     render(

@@ -7,7 +7,14 @@ import { RetroButton } from "@/components/ui/RetroButton";
 import { RetroWindow } from "@/components/ui/RetroWindow";
 import { createSignOut } from "@/lib/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { createTaskService, filterTasks, type TaskFilter, type TaskInput, type TaskRecord } from "@/lib/tasks";
+import {
+  createTaskService,
+  filterTasks,
+  validateTaskInput,
+  type TaskFilter,
+  type TaskInput,
+  type TaskRecord,
+} from "@/lib/tasks";
 
 interface TaskDesktopProps {
   userEmail: string;
@@ -18,6 +25,7 @@ interface TaskDesktopProps {
 export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDesktopProps) {
   const [tasks, setTasks] = useState<TaskRecord[]>(initialTasks);
   const [filter, setFilter] = useState<TaskFilter>("today");
+  const [editingTask, setEditingTask] = useState<TaskRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
   const visibleTasks = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
 
@@ -54,6 +62,49 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
 
     setError(null);
     setTasks((current) => [result.value, ...current]);
+  }
+
+  async function updateTask(input: TaskInput) {
+    if (!editingTask) return;
+
+    const validated = validateTaskInput(input);
+    if (!validated.ok) {
+      setError(validated.message);
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    if (!userId) {
+      setTasks((current) =>
+        current.map((task) =>
+          task.id === editingTask.id
+            ? {
+                ...task,
+                title: validated.value.title,
+                note: validated.value.note,
+                due_date: validated.value.dueDate,
+                priority: validated.value.priority,
+                updated_at: now,
+              }
+            : task,
+        ),
+      );
+      setEditingTask(null);
+      setError(null);
+      return;
+    }
+
+    const result = await createTaskService(createSupabaseBrowserClient(), userId).updateTask(editingTask.id, input);
+
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+
+    setTasks((current) => current.map((task) => (task.id === editingTask.id ? result.value : task)));
+    setEditingTask(null);
+    setError(null);
   }
 
   async function toggleTask(id: string) {
@@ -131,9 +182,14 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
             </RetroButton>
           </div>
         </div>
-        <TaskEditor onSubmit={(input) => void addTask(input)} />
+        <TaskEditor
+          mode={editingTask ? "edit" : "create"}
+          initialTask={editingTask ?? undefined}
+          onSubmit={(input) => void (editingTask ? updateTask(input) : addTask(input))}
+          onCancel={editingTask ? () => setEditingTask(null) : undefined}
+        />
         {error && <p className="retro-error">{error}</p>}
-        <TaskList tasks={visibleTasks} onToggle={toggleTask} onDelete={deleteTask} />
+        <TaskList tasks={visibleTasks} onToggle={toggleTask} onEdit={setEditingTask} onDelete={deleteTask} />
       </RetroWindow>
     </main>
   );
