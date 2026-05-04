@@ -24,13 +24,17 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
     <ul className="task-list">
       {tasks.map((task) => (
         <li className={task.completed_at ? "task-row completed" : "task-row"} key={task.id}>
-          <RetroButton
+          <button
+            className="task-check-button"
             type="button"
             aria-label={`${task.title} ${task.completed_at ? "완료 취소" : "완료"}`}
+            aria-pressed={Boolean(task.completed_at)}
             onClick={() => void onToggle(task.id)}
           >
-            {task.completed_at ? "✓" : "□"}
-          </RetroButton>
+            <span className="task-check-box" aria-hidden="true">
+              {task.completed_at ? "✓" : ""}
+            </span>
+          </button>
           <div className="task-main">
             <span className="task-title-line">{task.title}</span>
             {task.note && <p className="task-note">{task.note}</p>}
