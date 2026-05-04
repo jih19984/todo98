@@ -56,7 +56,10 @@ export function validateTaskInput(input: TaskInput): ValidatedTaskInput {
 }
 
 export function dateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function filterTasks(tasks: TaskRecord[], filter: TaskFilter, today = new Date()): TaskRecord[] {
@@ -98,6 +101,27 @@ export function createTaskService(client: SupabaseClient, userId: string) {
           due_date: validated.value.dueDate,
           priority: validated.value.priority,
         })
+        .select()
+        .single();
+
+      if (error) return { ok: false as const, message: error.message };
+      return { ok: true as const, value: data as TaskRecord };
+    },
+
+    async updateTask(taskId: string, input: TaskInput) {
+      const validated = validateTaskInput(input);
+      if (!validated.ok) return validated;
+
+      const { data, error } = await client
+        .from("tasks")
+        .update({
+          title: validated.value.title,
+          note: validated.value.note,
+          due_date: validated.value.dueDate,
+          priority: validated.value.priority,
+        })
+        .eq("id", taskId)
+        .eq("user_id", userId)
         .select()
         .single();
 

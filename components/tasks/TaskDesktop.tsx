@@ -7,7 +7,14 @@ import { RetroButton } from "@/components/ui/RetroButton";
 import { RetroWindow } from "@/components/ui/RetroWindow";
 import { createSignOut } from "@/lib/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { createTaskService, dateKey, filterTasks, type TaskFilter, type TaskRecord } from "@/lib/tasks";
+import {
+  createTaskService,
+  filterTasks,
+  validateTaskInput,
+  type TaskFilter,
+  type TaskInput,
+  type TaskRecord,
+} from "@/lib/tasks";
 
 interface TaskDesktopProps {
   userEmail: string;
@@ -18,18 +25,19 @@ interface TaskDesktopProps {
 export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDesktopProps) {
   const [tasks, setTasks] = useState<TaskRecord[]>(initialTasks);
   const [filter, setFilter] = useState<TaskFilter>("today");
+  const [editingTask, setEditingTask] = useState<TaskRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
   const visibleTasks = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
 
-  async function addTask(title: string) {
+  async function addTask(input: TaskInput) {
     const now = new Date().toISOString();
     const localTask = {
       id: crypto.randomUUID(),
       user_id: userId ?? "local",
-      title,
-      note: null,
-      due_date: dateKey(new Date()),
-      priority: "normal" as const,
+      title: input.title.trim(),
+      note: input.note?.trim() || null,
+      due_date: input.dueDate || null,
+      priority: input.priority || "normal",
       completed_at: null,
       created_at: now,
       updated_at: now,
@@ -41,8 +49,10 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
     }
 
     const result = await createTaskService(createSupabaseBrowserClient(), userId).createTask({
-      title,
-      dueDate: localTask.due_date,
+      title: input.title,
+      note: input.note,
+      dueDate: input.dueDate,
+      priority: input.priority,
     });
 
     if (!result.ok) {
@@ -52,6 +62,49 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
 
     setError(null);
     setTasks((current) => [result.value, ...current]);
+  }
+
+  async function updateTask(input: TaskInput) {
+    if (!editingTask) return;
+
+    const validated = validateTaskInput(input);
+    if (!validated.ok) {
+      setError(validated.message);
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    if (!userId) {
+      setTasks((current) =>
+        current.map((task) =>
+          task.id === editingTask.id
+            ? {
+                ...task,
+                title: validated.value.title,
+                note: validated.value.note,
+                due_date: validated.value.dueDate,
+                priority: validated.value.priority,
+                updated_at: now,
+              }
+            : task,
+        ),
+      );
+      setEditingTask(null);
+      setError(null);
+      return;
+    }
+
+    const result = await createTaskService(createSupabaseBrowserClient(), userId).updateTask(editingTask.id, input);
+
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+
+    setTasks((current) => current.map((task) => (task.id === editingTask.id ? result.value : task)));
+    setEditingTask(null);
+    setError(null);
   }
 
   async function toggleTask(id: string) {
@@ -89,6 +142,9 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
     }
 
     setError(null);
+    if (editingTask?.id === id) {
+      setEditingTask(null);
+    }
     setTasks((current) => current.filter((task) => task.id !== id));
   }
 
@@ -118,20 +174,40 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
             <h1>오늘 할 일</h1>
           </div>
           <div className="filter-row" aria-label="필터">
-            <RetroButton type="button" onClick={() => setFilter("today")}>
+            <RetroButton
+              type="button"
+              aria-pressed={filter === "today"}
+              className={filter === "today" ? "is-active" : ""}
+              onClick={() => setFilter("today")}
+            >
               오늘
             </RetroButton>
-            <RetroButton type="button" onClick={() => setFilter("all")}>
+            <RetroButton
+              type="button"
+              aria-pressed={filter === "all"}
+              className={filter === "all" ? "is-active" : ""}
+              onClick={() => setFilter("all")}
+            >
               전체
             </RetroButton>
-            <RetroButton type="button" onClick={() => setFilter("completed")}>
+            <RetroButton
+              type="button"
+              aria-pressed={filter === "completed"}
+              className={filter === "completed" ? "is-active" : ""}
+              onClick={() => setFilter("completed")}
+            >
               완료
             </RetroButton>
           </div>
         </div>
-        <TaskEditor onAdd={(title) => void addTask(title)} />
+        <TaskEditor
+          mode={editingTask ? "edit" : "create"}
+          initialTask={editingTask ?? undefined}
+          onSubmit={(input) => void (editingTask ? updateTask(input) : addTask(input))}
+          onCancel={editingTask ? () => setEditingTask(null) : undefined}
+        />
         {error && <p className="retro-error">{error}</p>}
-        <TaskList tasks={visibleTasks} onToggle={toggleTask} onDelete={deleteTask} />
+        <TaskList tasks={visibleTasks} onToggle={toggleTask} onEdit={setEditingTask} onDelete={deleteTask} />
       </RetroWindow>
     </main>
   );
