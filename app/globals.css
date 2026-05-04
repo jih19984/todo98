@@ -22,12 +22,10 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at 16% 15%, rgba(143, 255, 234, 0.62) 0 110px, transparent 112px),
-    radial-gradient(circle at 86% 12%, rgba(255, 114, 210, 0.38) 0 140px, transparent 142px),
     linear-gradient(rgba(17, 17, 17, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(17, 17, 17, 0.05) 1px, transparent 1px),
     var(--paper);
-  background-size: auto, auto, 24px 24px, 24px 24px, auto;
+  background-size: 24px 24px, 24px 24px, auto;
   font-family: "Trebuchet MS", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 
