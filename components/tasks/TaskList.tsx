@@ -48,7 +48,12 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
               수정
             </RetroButton>
           )}
-          <RetroButton type="button" aria-label={`${task.title} 삭제`} onClick={() => void onDelete(task.id)}>
+          <RetroButton
+            type="button"
+            className="task-delete-button"
+            aria-label={`${task.title} 삭제`}
+            onClick={() => void onDelete(task.id)}
+          >
             삭제
           </RetroButton>
         </li>

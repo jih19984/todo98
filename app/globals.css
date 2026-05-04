@@ -230,6 +230,32 @@ textarea {
   background: #ffffff;
 }
 
+.task-row:hover,
+.task-row:focus-within {
+  background: #fffdf7;
+  box-shadow: 3px 3px 0 var(--shadow);
+  transform: translate(-1px, -1px);
+}
+
+.task-row.completed:hover,
+.task-row.completed:focus-within {
+  background: #fbfbfb;
+  box-shadow: 2px 2px 0 var(--shadow);
+  transform: none;
+}
+
+.task-row .retro-button:hover,
+.task-row .retro-button:focus-visible {
+  background: var(--lemon);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow);
+}
+
+.task-row .task-delete-button:hover,
+.task-row .task-delete-button:focus-visible {
+  background: #fff0f7;
+}
+
 .task-check-button {
   width: 34px;
   height: 34px;
