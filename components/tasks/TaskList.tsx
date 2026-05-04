@@ -49,10 +49,8 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
             </span>
           </button>
           <div className="task-main">
-            <span className="task-title-line">{task.title}</span>
-            {task.note && <p className="task-note">{task.note}</p>}
-            <div className="task-meta">
-              {task.due_date && <small className="task-chip">{task.due_date}</small>}
+            <span className="task-title-line">
+              {task.title}
               <small className="task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
                 <span className="priority-mark-stack" aria-hidden="true">
                   {Array.from({ length: priorityLevels[task.priority] }, (_, index) => (
@@ -60,21 +58,25 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
                   ))}
                 </span>
               </small>
-            </div>
+            </span>
+            {task.note && <p className="task-note">{task.note}</p>}
           </div>
-          {onEdit && (
-            <RetroButton type="button" aria-label={`${task.title} 수정`} onClick={() => onEdit(task)}>
-              수정
+          {task.due_date && <small className="task-chip task-date-chip">{task.due_date}</small>}
+          <div className="task-row-actions">
+            {onEdit && (
+              <RetroButton type="button" aria-label={`${task.title} 수정`} onClick={() => onEdit(task)}>
+                수정
+              </RetroButton>
+            )}
+            <RetroButton
+              type="button"
+              className="task-delete-button"
+              aria-label={`${task.title} 삭제`}
+              onClick={() => void onDelete(task.id)}
+            >
+              삭제
             </RetroButton>
-          )}
-          <RetroButton
-            type="button"
-            className="task-delete-button"
-            aria-label={`${task.title} 삭제`}
-            onClick={() => void onDelete(task.id)}
-          >
-            삭제
-          </RetroButton>
+          </div>
         </li>
       ))}
     </ul>

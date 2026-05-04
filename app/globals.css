@@ -224,7 +224,8 @@ textarea {
 
 .task-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
   align-items: start;
   gap: 10px;
   padding: 10px;
@@ -246,15 +247,22 @@ textarea {
   transform: none;
 }
 
-.task-row .retro-button:hover,
-.task-row .retro-button:focus-visible {
+.task-row-actions .retro-button {
+  min-height: 30px;
+  padding: 0 9px;
+  font-size: 13px;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.task-row-actions .retro-button:hover,
+.task-row-actions .retro-button:focus-visible {
   background: var(--lemon);
-  transform: translate(2px, 2px);
+  transform: translate(1px, 1px);
   box-shadow: 1px 1px 0 var(--shadow);
 }
 
-.task-row .task-delete-button:hover,
-.task-row .task-delete-button:focus-visible {
+.task-row-actions .task-delete-button:hover,
+.task-row-actions .task-delete-button:focus-visible {
   background: #fff0f7;
 }
 
@@ -308,12 +316,17 @@ textarea {
 }
 
 .task-main {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   min-width: 0;
   display: grid;
   gap: 5px;
 }
 
 .task-title-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 900;
   overflow-wrap: anywhere;
 }
@@ -325,12 +338,6 @@ textarea {
   overflow-wrap: anywhere;
 }
 
-.task-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .task-chip {
   padding: 4px 7px;
   border: 1px solid var(--ink);
@@ -338,12 +345,19 @@ textarea {
   font-weight: 900;
 }
 
+.task-date-chip {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+
 .task-priority-chip {
   min-width: 18px;
-  min-height: 22px;
+  min-height: 18px;
   display: inline-grid;
   place-items: center;
   padding: 1px 3px;
+  flex: 0 0 auto;
 }
 
 .priority-mark-stack {
@@ -353,9 +367,18 @@ textarea {
 }
 
 .priority-mark {
-  width: 13px;
-  height: 8px;
+  width: 12px;
+  height: 7px;
   color: var(--ink);
+}
+
+.task-row-actions {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-self: end;
+  gap: 6px;
 }
 
 .empty-task {
@@ -379,11 +402,23 @@ textarea {
 
   .task-row {
     grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
   }
 
-  .task-row > .retro-button:last-child,
-  .task-row > .retro-button:nth-last-child(2) {
+  .task-main {
     grid-column: 2;
+    grid-row: 1;
+  }
+
+  .task-date-chip {
+    grid-column: 2;
+    grid-row: 2;
     justify-self: start;
+  }
+
+  .task-row-actions {
+    grid-column: 2;
+    grid-row: 3;
+    justify-content: flex-start;
   }
 }
