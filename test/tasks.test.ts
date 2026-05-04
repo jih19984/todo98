@@ -20,6 +20,25 @@ describe("task validation", () => {
       },
     });
   });
+
+  it("trims note and keeps explicit due date and priority", () => {
+    expect(
+      validateTaskInput({
+        title: "  디자인 점검  ",
+        note: "  Lazyweb 참고 반영  ",
+        dueDate: "2026-05-05",
+        priority: "high",
+      }),
+    ).toEqual({
+      ok: true,
+      value: {
+        title: "디자인 점검",
+        note: "Lazyweb 참고 반영",
+        dueDate: "2026-05-05",
+        priority: "high",
+      },
+    });
+  });
 });
 
 describe("task service", () => {
@@ -75,5 +94,42 @@ describe("task service", () => {
     expect(completeResult.ok).toBe(true);
     expect(deleteCall).toHaveBeenCalled();
     expect(deleteResult).toEqual({ ok: true });
+  });
+
+  it("updates an existing task for the current user", async () => {
+    const update = vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          select: () => ({
+            single: async () => ({
+              data: {
+                id: "task-1",
+                title: "수정된 제목",
+                note: "메모",
+                due_date: "2026-05-05",
+                priority: "high",
+              },
+              error: null,
+            }),
+          }),
+        }),
+      }),
+    });
+    const service = createTaskService({ from: () => ({ update }) } as never, "user-1");
+
+    const result = await service.updateTask("task-1", {
+      title: " 수정된 제목 ",
+      note: " 메모 ",
+      dueDate: "2026-05-05",
+      priority: "high",
+    });
+
+    expect(update).toHaveBeenCalledWith({
+      title: "수정된 제목",
+      note: "메모",
+      due_date: "2026-05-05",
+      priority: "high",
+    });
+    expect(result.ok).toBe(true);
   });
 });

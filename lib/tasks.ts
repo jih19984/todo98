@@ -105,6 +105,27 @@ export function createTaskService(client: SupabaseClient, userId: string) {
       return { ok: true as const, value: data as TaskRecord };
     },
 
+    async updateTask(taskId: string, input: TaskInput) {
+      const validated = validateTaskInput(input);
+      if (!validated.ok) return validated;
+
+      const { data, error } = await client
+        .from("tasks")
+        .update({
+          title: validated.value.title,
+          note: validated.value.note,
+          due_date: validated.value.dueDate,
+          priority: validated.value.priority,
+        })
+        .eq("id", taskId)
+        .eq("user_id", userId)
+        .select()
+        .single();
+
+      if (error) return { ok: false as const, message: error.message };
+      return { ok: true as const, value: data as TaskRecord };
+    },
+
     async setTaskCompleted(taskId: string, completed: boolean) {
       const { data, error } = await client
         .from("tasks")
