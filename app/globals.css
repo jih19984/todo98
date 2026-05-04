@@ -94,6 +94,12 @@ textarea {
   opacity: 0.55;
 }
 
+.retro-button.is-active {
+  background: var(--lemon);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow);
+}
+
 .retro-input,
 .retro-select {
   width: 100%;
@@ -326,6 +332,7 @@ textarea {
 
   .task-toolbar,
   .task-editor-grid {
+    display: grid;
     grid-template-columns: 1fr;
   }
 
@@ -339,6 +346,7 @@ textarea {
 
   .task-row > .retro-button:last-child,
   .task-row > .retro-button:nth-last-child(2) {
-    grid-column: span 1;
+    grid-column: 2;
+    justify-self: start;
   }
 }

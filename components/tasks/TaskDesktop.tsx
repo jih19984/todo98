@@ -171,13 +171,28 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
             <h1>오늘 할 일</h1>
           </div>
           <div className="filter-row" aria-label="필터">
-            <RetroButton type="button" onClick={() => setFilter("today")}>
+            <RetroButton
+              type="button"
+              aria-pressed={filter === "today"}
+              className={filter === "today" ? "is-active" : ""}
+              onClick={() => setFilter("today")}
+            >
               오늘
             </RetroButton>
-            <RetroButton type="button" onClick={() => setFilter("all")}>
+            <RetroButton
+              type="button"
+              aria-pressed={filter === "all"}
+              className={filter === "all" ? "is-active" : ""}
+              onClick={() => setFilter("all")}
+            >
               전체
             </RetroButton>
-            <RetroButton type="button" onClick={() => setFilter("completed")}>
+            <RetroButton
+              type="button"
+              aria-pressed={filter === "completed"}
+              className={filter === "completed" ? "is-active" : ""}
+              onClick={() => setFilter("completed")}
+            >
               완료
             </RetroButton>
           </div>
