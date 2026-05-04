@@ -352,24 +352,19 @@ textarea {
 }
 
 .task-priority-chip {
-  min-width: 18px;
-  min-height: 18px;
+  width: 18px;
+  height: 18px;
   display: inline-grid;
   place-items: center;
-  padding: 1px 3px;
+  padding: 0;
   flex: 0 0 auto;
-}
-
-.priority-mark-stack {
-  display: inline-grid;
-  gap: 0;
-  place-items: center;
+  color: var(--ink);
 }
 
 .priority-mark {
-  width: 12px;
-  height: 7px;
-  color: var(--ink);
+  width: 17px;
+  height: 17px;
+  display: block;
 }
 
 .task-row-actions {

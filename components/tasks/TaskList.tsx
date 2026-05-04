@@ -1,19 +1,19 @@
 "use client";
 
-import { ChevronUp } from "lucide-react";
+import { SignalHigh, SignalLow, SignalMedium, type LucideIcon } from "lucide-react";
 import { RetroButton } from "@/components/ui/RetroButton";
 import type { TaskPriority, TaskRecord } from "@/lib/tasks";
-
-const priorityLevels: Record<TaskPriority, number> = {
-  low: 1,
-  normal: 2,
-  high: 3,
-};
 
 const priorityLabels: Record<TaskPriority, string> = {
   low: "낮음",
   normal: "보통",
   high: "높음",
+};
+
+const priorityIcons: Record<TaskPriority, LucideIcon> = {
+  low: SignalLow,
+  normal: SignalMedium,
+  high: SignalHigh,
 };
 
 interface TaskListProps {
@@ -35,50 +35,53 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
 
   return (
     <ul className="task-list">
-      {tasks.map((task) => (
-        <li className={task.completed_at ? "task-row completed" : "task-row"} key={task.id}>
-          <button
-            className="task-check-button"
-            type="button"
-            aria-label={`${task.title} ${task.completed_at ? "완료 취소" : "완료"}`}
-            aria-pressed={Boolean(task.completed_at)}
-            onClick={() => void onToggle(task.id)}
-          >
-            <span className="task-check-box" aria-hidden="true">
-              {task.completed_at ? "✓" : ""}
-            </span>
-          </button>
-          <div className="task-main">
-            <span className="task-title-line">
-              {task.title}
-              <small className="task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
-                <span className="priority-mark-stack" aria-hidden="true">
-                  {Array.from({ length: priorityLevels[task.priority] }, (_, index) => (
-                    <ChevronUp className="priority-mark" key={index} strokeWidth={3} />
-                  ))}
-                </span>
-              </small>
-            </span>
-            {task.note && <p className="task-note">{task.note}</p>}
-          </div>
-          {task.due_date && <small className="task-chip task-date-chip">{task.due_date}</small>}
-          <div className="task-row-actions">
-            {onEdit && (
-              <RetroButton type="button" aria-label={`${task.title} 수정`} onClick={() => onEdit(task)}>
-                수정
-              </RetroButton>
-            )}
-            <RetroButton
+      {tasks.map((task) => {
+        const PriorityIcon = priorityIcons[task.priority];
+
+        return (
+          <li className={task.completed_at ? "task-row completed" : "task-row"} key={task.id}>
+            <button
+              className="task-check-button"
               type="button"
-              className="task-delete-button"
-              aria-label={`${task.title} 삭제`}
-              onClick={() => void onDelete(task.id)}
+              aria-label={`${task.title} ${task.completed_at ? "완료 취소" : "완료"}`}
+              aria-pressed={Boolean(task.completed_at)}
+              onClick={() => void onToggle(task.id)}
             >
-              삭제
-            </RetroButton>
-          </div>
-        </li>
-      ))}
+              <span className="task-check-box" aria-hidden="true">
+                {task.completed_at ? "✓" : ""}
+              </span>
+            </button>
+            <div className="task-main">
+              <span className="task-title-line">
+                {task.title}
+                <small
+                  className={`task-priority-chip priority-${task.priority}`}
+                  aria-label={`우선순위 ${priorityLabels[task.priority]}`}
+                >
+                  <PriorityIcon className="priority-mark" aria-hidden="true" strokeWidth={2.6} />
+                </small>
+              </span>
+              {task.note && <p className="task-note">{task.note}</p>}
+            </div>
+            {task.due_date && <small className="task-chip task-date-chip">{task.due_date}</small>}
+            <div className="task-row-actions">
+              {onEdit && (
+                <RetroButton type="button" aria-label={`${task.title} 수정`} onClick={() => onEdit(task)}>
+                  수정
+                </RetroButton>
+              )}
+              <RetroButton
+                type="button"
+                className="task-delete-button"
+                aria-label={`${task.title} 삭제`}
+                onClick={() => void onDelete(task.id)}
+              >
+                삭제
+              </RetroButton>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
