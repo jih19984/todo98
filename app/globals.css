@@ -339,10 +339,11 @@ textarea {
 }
 
 .task-priority-chip {
-  min-width: 30px;
-  min-height: 24px;
+  min-width: 18px;
+  min-height: 22px;
   display: inline-grid;
   place-items: center;
+  padding: 1px 3px;
 }
 
 .priority-mark-stack {

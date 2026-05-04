@@ -53,7 +53,7 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete }: TaskListProps) {
             {task.note && <p className="task-note">{task.note}</p>}
             <div className="task-meta">
               {task.due_date && <small className="task-chip">{task.due_date}</small>}
-              <small className="task-chip task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
+              <small className="task-priority-chip" aria-label={`우선순위 ${priorityLabels[task.priority]}`}>
                 <span className="priority-mark-stack" aria-hidden="true">
                   {Array.from({ length: priorityLevels[task.priority] }, (_, index) => (
                     <ChevronUp className="priority-mark" key={index} strokeWidth={3} />
