@@ -198,7 +198,7 @@ describe("TaskDesktop", () => {
       />,
     );
 
-    const list = screen.getByRole("list");
+    const list = screen.getByRole("list", { name: "할 일 목록" });
     const firstTask = screen.getByText("첫 번째").closest("li");
     const secondTask = screen.getByText("두 번째").closest("li");
     const dataTransfer = {
@@ -223,6 +223,52 @@ describe("TaskDesktop", () => {
     fireEvent.drop(firstTask as HTMLLIElement, { dataTransfer });
 
     expect(list.querySelectorAll("li")[0]).toHaveTextContent("두 번째");
+  });
+
+  it("switches missions and opens tasks for a calendar date", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "오늘 미션",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: "2026-05-05T03:00:00.000Z",
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T03:00:00.000Z",
+          },
+          {
+            id: "task-2",
+            user_id: "local",
+            title: "내일 할 일",
+            note: null,
+            due_date: "2026-05-06",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Daily.mission")).toBeInTheDocument();
+    expect(screen.getByText("Points 30P")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "주간 미션" }));
+
+    expect(screen.getByText("Weekly.mission")).toBeInTheDocument();
+    expect(screen.getByText("이번 주 할 일 10개 완료")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "2026-05-06 할 일 보기" }));
+
+    expect(screen.getByText("내일 할 일")).toBeInTheDocument();
+    expect(screen.queryByText("오늘 미션")).not.toBeInTheDocument();
   });
 
   it("signs out from the account window", async () => {

@@ -9,6 +9,7 @@ import { createSignOut } from "@/lib/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
   createTaskService,
+  dateKey,
   filterTasks,
   validateTaskInput,
   type TaskFilter,
@@ -22,12 +23,72 @@ interface TaskDesktopProps {
   initialTasks?: TaskRecord[];
 }
 
+type MissionMode = "daily" | "weekly";
+
+function dateFromKey(key: string) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatDisplayDate(key: string) {
+  return key.replaceAll("-", ". ");
+}
+
+function isSameWeek(date: Date, selectedDate: Date) {
+  const weekStart = new Date(selectedDate);
+  weekStart.setDate(selectedDate.getDate() - selectedDate.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 7);
+
+  return date >= weekStart && date < weekEnd;
+}
+
+function buildCalendarDays(selectedDate: Date) {
+  const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+  const lastDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+  const blanks = Array.from({ length: firstDay.getDay() }, () => null);
+  const days = Array.from({ length: lastDay.getDate() }, (_, index) => index + 1);
+  return [...blanks, ...days];
+}
+
 export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDesktopProps) {
   const [tasks, setTasks] = useState<TaskRecord[]>(initialTasks);
   const [filter, setFilter] = useState<TaskFilter>("today");
+  const [selectedDate, setSelectedDate] = useState(dateKey(new Date()));
+  const [missionMode, setMissionMode] = useState<MissionMode>("daily");
   const [editingTask, setEditingTask] = useState<TaskRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const visibleTasks = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
+  const selectedDateValue = useMemo(() => dateFromKey(selectedDate), [selectedDate]);
+  const visibleTasks = useMemo(() => filterTasks(tasks, filter, selectedDateValue), [tasks, filter, selectedDateValue]);
+  const selectedDateTasks = useMemo(
+    () => tasks.filter((task) => task.due_date === selectedDate),
+    [tasks, selectedDate],
+  );
+  const selectedDateCompletedCount = selectedDateTasks.filter((task) => Boolean(task.completed_at)).length;
+  const weeklyCompletedCount = tasks.filter((task) => {
+    if (!task.completed_at) return false;
+    return isSameWeek(dateFromKey(task.due_date ?? task.created_at.slice(0, 10)), selectedDateValue);
+  }).length;
+  const weeklyActiveDays = new Set(
+    tasks
+      .filter((task) => task.completed_at && isSameWeek(dateFromKey(task.due_date ?? task.created_at.slice(0, 10)), selectedDateValue))
+      .map((task) => task.due_date ?? task.created_at.slice(0, 10)),
+  ).size;
+  const dailyMissions = [
+    { label: "할 일 1개 추가", points: 10, done: selectedDateTasks.length >= 1 },
+    { label: "할 일 1개 완료", points: 20, done: selectedDateCompletedCount >= 1 },
+    { label: "할 일 3개 완료", points: 50, done: selectedDateCompletedCount >= 3 },
+  ];
+  const weeklyMissions = [
+    { label: "이번 주 할 일 10개 완료", points: 150, done: weeklyCompletedCount >= 10 },
+    { label: "3일 이상 할 일 완료", points: 100, done: weeklyActiveDays >= 3 },
+    { label: "5일 이상 할 일 완료", points: 200, done: weeklyActiveDays >= 5 },
+  ];
+  const visibleMissions = missionMode === "daily" ? dailyMissions : weeklyMissions;
+  const earnedPoints = visibleMissions.reduce((sum, mission) => sum + (mission.done ? mission.points : 0), 0);
+  const calendarDays = buildCalendarDays(selectedDateValue);
 
   function reorderTask(draggedId: string, targetId: string) {
     setTasks((current) => {
@@ -176,25 +237,94 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
 
   return (
     <main className="desktop-shell task-desktop">
-      <RetroWindow title="User.ini" className="account-window">
-        <p className="eyebrow">Signed in</p>
-        <p>{userEmail}</p>
-        <RetroButton type="button" onClick={() => void handleSignOut()}>
-          로그아웃
-        </RetroButton>
-      </RetroWindow>
+      <aside className="right-rail" aria-label="사용자 패널">
+        <RetroWindow title="User.ini" className="account-window">
+          <p className="eyebrow">Signed in</p>
+          <p>{userEmail}</p>
+          <RetroButton type="button" onClick={() => void handleSignOut()}>
+            로그아웃
+          </RetroButton>
+        </RetroWindow>
+        <RetroWindow title={missionMode === "daily" ? "Daily.mission" : "Weekly.mission"} className="mission-window">
+          <div className="mission-toggle" aria-label="미션 보기">
+            <RetroButton
+              type="button"
+              aria-pressed={missionMode === "daily"}
+              className={missionMode === "daily" ? "is-active" : ""}
+              onClick={() => setMissionMode("daily")}
+            >
+              일일 미션
+            </RetroButton>
+            <RetroButton
+              type="button"
+              aria-pressed={missionMode === "weekly"}
+              className={missionMode === "weekly" ? "is-active" : ""}
+              onClick={() => setMissionMode("weekly")}
+            >
+              주간 미션
+            </RetroButton>
+          </div>
+          <p className="mission-points">Points {earnedPoints}P</p>
+          <ul className="mission-list">
+            {visibleMissions.map((mission) => (
+              <li className={mission.done ? "mission-item is-done" : "mission-item"} key={mission.label}>
+                <span>{mission.done ? "✓" : ""}</span>
+                <p>{mission.label}</p>
+                <strong>+{mission.points}P</strong>
+              </li>
+            ))}
+          </ul>
+        </RetroWindow>
+        <RetroWindow title="Calendar.exe" className="calendar-window">
+          <div className="calendar-heading">
+            <strong>
+              {selectedDateValue.getFullYear()}. {String(selectedDateValue.getMonth() + 1).padStart(2, "0")}
+            </strong>
+          </div>
+          <div className="calendar-weekdays" aria-hidden="true">
+            {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+              <span key={`${day}-${index}`}>{day}</span>
+            ))}
+          </div>
+          <div className="calendar-grid">
+            {calendarDays.map((day, index) => {
+              if (!day) return <span className="calendar-empty" key={`blank-${index}`} />;
+              const key = dateKey(new Date(selectedDateValue.getFullYear(), selectedDateValue.getMonth(), day));
+              const taskCount = tasks.filter((task) => task.due_date === key).length;
+              return (
+                <button
+                  className={key === selectedDate ? "calendar-day is-selected" : "calendar-day"}
+                  type="button"
+                  aria-label={`${key} 할 일 보기`}
+                  key={key}
+                  onClick={() => {
+                    setSelectedDate(key);
+                    setFilter("today");
+                  }}
+                >
+                  <span>{day}</span>
+                  {taskCount > 0 && <small>{taskCount}</small>}
+                </button>
+              );
+            })}
+          </div>
+        </RetroWindow>
+      </aside>
       <RetroWindow title="Today.tasks" className="tasks-window">
         <div className="task-toolbar">
           <div>
             <p className="eyebrow">Todo98</p>
-            <h1>오늘 할 일</h1>
+            <h1>{selectedDate === dateKey(new Date()) ? "오늘 할 일" : `${formatDisplayDate(selectedDate)} 할 일`}</h1>
           </div>
           <div className="filter-row" aria-label="필터">
             <RetroButton
               type="button"
               aria-pressed={filter === "today"}
               className={filter === "today" ? "is-active" : ""}
-              onClick={() => setFilter("today")}
+              onClick={() => {
+                setSelectedDate(dateKey(new Date()));
+                setFilter("today");
+              }}
             >
               오늘
             </RetroButton>
@@ -219,7 +349,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
         <TaskEditor
           mode={editingTask ? "edit" : "create"}
           initialTask={editingTask ?? undefined}
-          onSubmit={(input) => void (editingTask ? updateTask(input) : addTask(input))}
+          onSubmit={(input) => void (editingTask ? updateTask(input) : addTask({ ...input, dueDate: selectedDate }))}
           onCancel={editingTask ? () => setEditingTask(null) : undefined}
         />
         {error && <p className="retro-error">{error}</p>}

@@ -22,7 +22,7 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete, onReorder }: TaskL
   }
 
   return (
-    <ul className="task-list">
+    <ul className="task-list" aria-label="할 일 목록">
       {tasks.map((task) => (
         <li
           className={task.completed_at ? "task-row completed" : "task-row"}

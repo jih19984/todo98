@@ -180,16 +180,26 @@ textarea {
   padding-right: 280px;
 }
 
-.account-window {
+.right-rail {
   position: fixed;
   top: 32px;
   right: max(12px, calc((100vw - 1120px) / 2));
   width: 240px;
-  font-size: 12px;
+  display: grid;
+  gap: 12px;
   z-index: 5;
 }
 
-.account-window .retro-titlebar {
+.account-window,
+.mission-window,
+.calendar-window {
+  width: 100%;
+  font-size: 12px;
+}
+
+.account-window .retro-titlebar,
+.mission-window .retro-titlebar,
+.calendar-window .retro-titlebar {
   min-height: 28px;
   padding: 4px 7px;
 }
@@ -219,6 +229,124 @@ textarea {
   padding: 0 8px;
   font-size: 12px;
   box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.mission-window .retro-window-body,
+.calendar-window .retro-window-body {
+  padding: 10px;
+}
+
+.mission-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.mission-toggle .retro-button {
+  min-height: 30px;
+  padding: 0 6px;
+  font-size: 12px;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.mission-points {
+  margin: 10px 0;
+  font-weight: 900;
+}
+
+.mission-list {
+  display: grid;
+  gap: 7px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mission-item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+  padding: 7px;
+  border: 1px solid var(--ink);
+  background: #ffffff;
+}
+
+.mission-item span {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--ink);
+  font-weight: 900;
+}
+
+.mission-item p {
+  margin: 0;
+  line-height: 1.3;
+}
+
+.mission-item strong {
+  font-size: 11px;
+}
+
+.mission-item.is-done {
+  background: var(--mint);
+}
+
+.calendar-heading {
+  margin-bottom: 8px;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekdays {
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.calendar-empty,
+.calendar-day {
+  aspect-ratio: 1;
+}
+
+.calendar-day {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--ink);
+  background: #ffffff;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 900;
+  position: relative;
+}
+
+.calendar-day:hover,
+.calendar-day:focus-visible,
+.calendar-day.is-selected {
+  background: var(--lemon);
+}
+
+.calendar-day small {
+  min-width: 12px;
+  height: 12px;
+  display: inline-grid;
+  place-items: center;
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  border: 1px solid var(--ink);
+  background: var(--mint);
+  font-size: 9px;
+  line-height: 1;
 }
 
 .tasks-window h1 {
@@ -469,10 +597,14 @@ textarea {
     width: min(230px, 58vw);
   }
 
-  .account-window {
+  .right-rail {
     position: static;
     width: 100%;
     margin-bottom: 14px;
+  }
+
+  .task-desktop {
+    padding-right: 0;
   }
 
   .task-toolbar,
