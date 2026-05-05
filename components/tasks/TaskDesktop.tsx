@@ -301,7 +301,6 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
         <RetroWindow title="Calendar.exe" className="calendar-window">
           <div className="calendar-heading">
             <label>
-              <span>년도</span>
               <select
                 className="retro-select calendar-select"
                 aria-label="년도"
@@ -310,13 +309,12 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
               >
                 {calendarYears.map((year) => (
                   <option value={year} key={year}>
-                    {year}
+                    {year}년
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              <span>월</span>
               <select
                 className="retro-select calendar-select"
                 aria-label="월"
