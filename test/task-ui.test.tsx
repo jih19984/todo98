@@ -48,7 +48,6 @@ describe("TaskDesktop", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "전체" }));
     await user.click(screen.getByRole("button", { name: "초안 수정" }));
     await user.clear(screen.getByLabelText("할 일 제목"));
     await user.type(screen.getByLabelText("할 일 제목"), "수정된 할 일");
@@ -80,7 +79,6 @@ describe("TaskDesktop", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "전체" }));
     await user.click(screen.getByRole("button", { name: "유지할 제목 수정" }));
     await user.clear(screen.getByLabelText("할 일 제목"));
     await user.type(screen.getByLabelText("할 일 제목"), "버릴 제목");
@@ -111,7 +109,6 @@ describe("TaskDesktop", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "전체" }));
     await user.click(screen.getByRole("button", { name: "삭제할 제목 수정" }));
     expect(screen.getByRole("button", { name: "수정 저장" })).toBeInTheDocument();
 
@@ -142,14 +139,12 @@ describe("TaskDesktop", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "전체" }));
-
     expect(screen.getByText("Lazyweb 레퍼런스 반영")).toBeInTheDocument();
     expect(screen.getByText("Any.do와 Sunsama 참고")).toBeInTheDocument();
     expect(screen.queryByText("2026-05-05")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("우선순위 높음")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "완료" }));
+    await user.click(screen.getByRole("button", { name: "2026-05-06 할 일 보기" }));
 
     expect(screen.getByText("표시할 할 일이 없습니다.")).toBeInTheDocument();
     expect(screen.getByText("새 할 일을 추가하면 이 창에 바로 나타납니다.")).toBeInTheDocument();
@@ -175,9 +170,6 @@ describe("TaskDesktop", () => {
     await user.click(screen.getByRole("button", { name: "도메인 구매하기 완료" }));
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "도메인 구매하기 완료 취소" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "완료" }));
-
-    expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
   });
 
   it("toggles a task when clicking the task row", async () => {

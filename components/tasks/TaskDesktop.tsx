@@ -14,7 +14,6 @@ import {
   dateKey,
   filterTasks,
   validateTaskInput,
-  type TaskFilter,
   type TaskInput,
   type TaskRecord,
 } from "@/lib/tasks";
@@ -61,7 +60,6 @@ function buildYearOptions(centerYear: number) {
 
 export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDesktopProps) {
   const [tasks, setTasks] = useState<TaskRecord[]>(initialTasks);
-  const [filter, setFilter] = useState<TaskFilter>("today");
   const [selectedDate, setSelectedDate] = useState(dateKey(new Date()));
   const [calendarViewDate, setCalendarViewDate] = useState(dateFromKey(dateKey(new Date())));
   const [missionMode, setMissionMode] = useState<MissionMode>("daily");
@@ -70,7 +68,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   const todayKey = dateKey(new Date());
   const todayDateValue = useMemo(() => dateFromKey(todayKey), [todayKey]);
   const selectedDateValue = useMemo(() => dateFromKey(selectedDate), [selectedDate]);
-  const visibleTasks = useMemo(() => filterTasks(tasks, filter, selectedDateValue), [tasks, filter, selectedDateValue]);
+  const visibleTasks = useMemo(() => filterTasks(tasks, "today", selectedDateValue), [tasks, selectedDateValue]);
   const todayTasks = useMemo(
     () => tasks.filter((task) => task.due_date === todayKey),
     [tasks, todayKey],
@@ -368,10 +366,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
                   type="button"
                   aria-label={`${key} 할 일 보기`}
                   key={key}
-                  onClick={() => {
-                    setSelectedDate(key);
-                    setFilter("today");
-                  }}
+                  onClick={() => setSelectedDate(key)}
                 >
                   <span>{day}</span>
                   {taskCount > 0 && <small>{taskCount}</small>}
@@ -385,35 +380,6 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
         <div className="task-toolbar">
           <div>
             <h1>{selectedDate === todayKey ? "오늘 할 일" : `${formatDisplayDate(selectedDate)} 할 일`}</h1>
-          </div>
-          <div className="filter-row" aria-label="필터">
-            <RetroButton
-              type="button"
-              aria-pressed={filter === "today"}
-              className={filter === "today" ? "is-active" : ""}
-              onClick={() => {
-                setSelectedDate(todayKey);
-                setFilter("today");
-              }}
-            >
-              오늘
-            </RetroButton>
-            <RetroButton
-              type="button"
-              aria-pressed={filter === "all"}
-              className={filter === "all" ? "is-active" : ""}
-              onClick={() => setFilter("all")}
-            >
-              전체
-            </RetroButton>
-            <RetroButton
-              type="button"
-              aria-pressed={filter === "completed"}
-              className={filter === "completed" ? "is-active" : ""}
-              onClick={() => setFilter("completed")}
-            >
-              완료
-            </RetroButton>
           </div>
         </div>
         <TaskEditor

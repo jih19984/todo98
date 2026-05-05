@@ -456,12 +456,6 @@ img {
   margin-bottom: 18px;
 }
 
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 .task-editor {
   margin-bottom: 18px;
 }
