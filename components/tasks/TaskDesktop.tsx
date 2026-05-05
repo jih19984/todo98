@@ -60,26 +60,28 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   const [missionMode, setMissionMode] = useState<MissionMode>("daily");
   const [editingTask, setEditingTask] = useState<TaskRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const todayKey = dateKey(new Date());
+  const todayDateValue = useMemo(() => dateFromKey(todayKey), [todayKey]);
   const selectedDateValue = useMemo(() => dateFromKey(selectedDate), [selectedDate]);
   const visibleTasks = useMemo(() => filterTasks(tasks, filter, selectedDateValue), [tasks, filter, selectedDateValue]);
-  const selectedDateTasks = useMemo(
-    () => tasks.filter((task) => task.due_date === selectedDate),
-    [tasks, selectedDate],
+  const todayTasks = useMemo(
+    () => tasks.filter((task) => task.due_date === todayKey),
+    [tasks, todayKey],
   );
-  const selectedDateCompletedCount = selectedDateTasks.filter((task) => Boolean(task.completed_at)).length;
+  const todayCompletedCount = todayTasks.filter((task) => Boolean(task.completed_at)).length;
   const weeklyCompletedCount = tasks.filter((task) => {
     if (!task.completed_at) return false;
-    return isSameWeek(dateFromKey(task.due_date ?? task.created_at.slice(0, 10)), selectedDateValue);
+    return isSameWeek(dateFromKey(task.due_date ?? task.created_at.slice(0, 10)), todayDateValue);
   }).length;
   const weeklyActiveDays = new Set(
     tasks
-      .filter((task) => task.completed_at && isSameWeek(dateFromKey(task.due_date ?? task.created_at.slice(0, 10)), selectedDateValue))
+      .filter((task) => task.completed_at && isSameWeek(dateFromKey(task.due_date ?? task.created_at.slice(0, 10)), todayDateValue))
       .map((task) => task.due_date ?? task.created_at.slice(0, 10)),
   ).size;
   const dailyMissions = [
-    { label: "할 일 1개 추가", points: 10, done: selectedDateTasks.length >= 1 },
-    { label: "할 일 1개 완료", points: 20, done: selectedDateCompletedCount >= 1 },
-    { label: "할 일 3개 완료", points: 50, done: selectedDateCompletedCount >= 3 },
+    { label: "할 일 1개 추가", points: 10, done: todayTasks.length >= 1 },
+    { label: "할 일 1개 완료", points: 20, done: todayCompletedCount >= 1 },
+    { label: "할 일 3개 완료", points: 50, done: todayCompletedCount >= 3 },
   ];
   const weeklyMissions = [
     { label: "이번 주 할 일 10개 완료", points: 150, done: weeklyCompletedCount >= 10 },
@@ -187,26 +189,36 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   async function toggleTask(id: string) {
     const now = new Date().toISOString();
     const target = tasks.find((task) => task.id === id);
-    const completed = !target?.completed_at;
+    if (!target) return;
+
+    const completed = !target.completed_at;
+    const optimisticCompletedAt = completed ? now : null;
+
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id ? { ...task, completed_at: optimisticCompletedAt, updated_at: now } : task,
+      ),
+    );
 
     if (!userId) {
-      setTasks((current) =>
-        current.map((task) =>
-          task.id === id ? { ...task, completed_at: completed ? now : null, updated_at: now } : task,
-        ),
-      );
       return;
     }
 
-    const result = await createTaskService(createSupabaseBrowserClient(), userId).setTaskCompleted(id, completed);
+    try {
+      const result = await createTaskService(createSupabaseBrowserClient(), userId).setTaskCompleted(id, completed);
 
-    if (!result.ok) {
-      setError(result.message);
-      return;
+      if (!result.ok) {
+        setError(result.message);
+        setTasks((current) => current.map((task) => (task.id === id ? target : task)));
+        return;
+      }
+
+      setError(null);
+      setTasks((current) => current.map((task) => (task.id === id ? result.value : task)));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "완료 상태를 저장하지 못했습니다.");
+      setTasks((current) => current.map((task) => (task.id === id ? target : task)));
     }
-
-    setError(null);
-    setTasks((current) => current.map((task) => (task.id === id ? result.value : task)));
   }
 
   async function deleteTask(id: string) {
@@ -314,7 +326,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
         <div className="task-toolbar">
           <div>
             <p className="eyebrow">Todo98</p>
-            <h1>{selectedDate === dateKey(new Date()) ? "오늘 할 일" : `${formatDisplayDate(selectedDate)} 할 일`}</h1>
+            <h1>{selectedDate === todayKey ? "오늘 할 일" : `${formatDisplayDate(selectedDate)} 할 일`}</h1>
           </div>
           <div className="filter-row" aria-label="필터">
             <RetroButton
@@ -322,7 +334,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
               aria-pressed={filter === "today"}
               className={filter === "today" ? "is-active" : ""}
               onClick={() => {
-                setSelectedDate(dateKey(new Date()));
+                setSelectedDate(todayKey);
                 setFilter("today");
               }}
             >

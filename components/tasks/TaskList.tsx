@@ -28,6 +28,10 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete, onReorder }: TaskL
           className={task.completed_at ? "task-row completed" : "task-row"}
           draggable={Boolean(onReorder)}
           key={task.id}
+          onClick={(event) => {
+            if ((event.target as HTMLElement).closest("button")) return;
+            void onToggle(task.id);
+          }}
           onDragStart={(event) => {
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData("text/plain", task.id);
@@ -51,7 +55,10 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete, onReorder }: TaskL
             type="button"
             aria-label={`${task.title} ${task.completed_at ? "완료 취소" : "완료"}`}
             aria-pressed={Boolean(task.completed_at)}
-            onClick={() => void onToggle(task.id)}
+            onClick={(event) => {
+              event.stopPropagation();
+              void onToggle(task.id);
+            }}
           >
             <span className="task-check-box" aria-hidden="true">
               {task.completed_at ? "✓" : ""}
@@ -63,7 +70,14 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete, onReorder }: TaskL
           </div>
           <div className="task-row-actions">
             {onEdit && (
-              <RetroButton type="button" aria-label={`${task.title} 수정`} onClick={() => onEdit(task)}>
+              <RetroButton
+                type="button"
+                aria-label={`${task.title} 수정`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onEdit(task);
+                }}
+              >
                 수정
               </RetroButton>
             )}
@@ -71,7 +85,10 @@ export function TaskList({ tasks, onToggle, onEdit, onDelete, onReorder }: TaskL
               type="button"
               className="task-delete-button"
               aria-label={`${task.title} 삭제`}
-              onClick={() => void onDelete(task.id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                void onDelete(task.id);
+              }}
             >
               삭제
             </RetroButton>

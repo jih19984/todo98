@@ -4,12 +4,25 @@ import { describe, expect, it, vi } from "vitest";
 import { TaskDesktop } from "@/components/tasks/TaskDesktop";
 
 const signOut = vi.fn().mockResolvedValue({ error: null });
+let setTaskCompletedResponse: Promise<{ data: unknown; error: { message: string } | null }> = Promise.resolve({
+  data: null,
+  error: null,
+});
+const taskQuery = {
+  eq: vi.fn(() => taskQuery),
+  select: vi.fn(() => taskQuery),
+  single: vi.fn(() => setTaskCompletedResponse),
+};
+const updateTask = vi.fn(() => taskQuery);
 
 vi.mock("@/lib/supabase/browser", () => ({
   createSupabaseBrowserClient: () => ({
     auth: {
       signOut,
     },
+    from: () => ({
+      update: updateTask,
+    }),
   }),
 }));
 
@@ -167,6 +180,79 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
   });
 
+  it("toggles a task when clicking the task row", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "행 클릭 할 일",
+            note: "체크박스 말고 본문 클릭",
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByText("행 클릭 할 일"));
+
+    expect(screen.getByRole("button", { name: "행 클릭 할 일 완료 취소" })).toBeInTheDocument();
+  });
+
+  it("checks an authenticated task before the server responds", async () => {
+    const user = userEvent.setup();
+    let resolveResponse: (value: { data: unknown; error: null }) => void = () => {};
+    setTaskCompletedResponse = new Promise((resolve) => {
+      resolveResponse = resolve;
+    });
+
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        userId="user-1"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "user-1",
+            title: "서버 할 일",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "서버 할 일 완료" }));
+
+    expect(screen.getByRole("button", { name: "서버 할 일 완료 취소" })).toBeInTheDocument();
+
+    resolveResponse({
+      data: {
+        id: "task-1",
+        user_id: "user-1",
+        title: "서버 할 일",
+        note: null,
+        due_date: "2026-05-05",
+        priority: "normal",
+        completed_at: "2026-05-05T03:00:00.000Z",
+        created_at: "2026-05-05T00:00:00.000Z",
+        updated_at: "2026-05-05T03:00:00.000Z",
+      },
+      error: null,
+    });
+  });
+
   it("reorders visible tasks by dragging a task row", () => {
     render(
       <TaskDesktop
@@ -253,6 +339,39 @@ describe("TaskDesktop", () => {
             created_at: "2026-05-05T00:00:00.000Z",
             updated_at: "2026-05-05T00:00:00.000Z",
           },
+          {
+            id: "task-3",
+            user_id: "local",
+            title: "다음 주 첫 할 일",
+            note: null,
+            due_date: "2026-05-12",
+            priority: "normal",
+            completed_at: "2026-05-12T03:00:00.000Z",
+            created_at: "2026-05-12T00:00:00.000Z",
+            updated_at: "2026-05-12T03:00:00.000Z",
+          },
+          {
+            id: "task-4",
+            user_id: "local",
+            title: "다음 주 둘째 할 일",
+            note: null,
+            due_date: "2026-05-13",
+            priority: "normal",
+            completed_at: "2026-05-13T03:00:00.000Z",
+            created_at: "2026-05-13T00:00:00.000Z",
+            updated_at: "2026-05-13T03:00:00.000Z",
+          },
+          {
+            id: "task-5",
+            user_id: "local",
+            title: "다음 주 셋째 할 일",
+            note: null,
+            due_date: "2026-05-14",
+            priority: "normal",
+            completed_at: "2026-05-14T03:00:00.000Z",
+            created_at: "2026-05-14T00:00:00.000Z",
+            updated_at: "2026-05-14T03:00:00.000Z",
+          },
         ]}
       />,
     );
@@ -260,15 +379,22 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("Daily.mission")).toBeInTheDocument();
     expect(screen.getByText("Points 30P")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "주간 미션" }));
-
-    expect(screen.getByText("Weekly.mission")).toBeInTheDocument();
-    expect(screen.getByText("이번 주 할 일 10개 완료")).toBeInTheDocument();
-
     await user.click(screen.getByRole("button", { name: "2026-05-06 할 일 보기" }));
 
     expect(screen.getByText("내일 할 일")).toBeInTheDocument();
     expect(screen.queryByText("오늘 미션")).not.toBeInTheDocument();
+    expect(screen.getByText("Points 30P")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "주간 미션" }));
+
+    expect(screen.getByText("Weekly.mission")).toBeInTheDocument();
+    expect(screen.getByText("이번 주 할 일 10개 완료")).toBeInTheDocument();
+    expect(screen.getByText("Points 0P")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "2026-05-12 할 일 보기" }));
+
+    expect(screen.getByText("다음 주 첫 할 일")).toBeInTheDocument();
+    expect(screen.getByText("Points 0P")).toBeInTheDocument();
   });
 
   it("signs out from the account window", async () => {

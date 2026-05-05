@@ -122,8 +122,9 @@ textarea {
 
 .landing-grid {
   display: grid;
-  grid-template-columns: minmax(0, 440px) minmax(220px, 320px);
-  gap: 18px;
+  grid-template-columns: minmax(0, 440px) minmax(280px, 380px);
+  column-gap: clamp(88px, 9vw, 132px);
+  row-gap: 24px;
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 64px);
@@ -145,9 +146,10 @@ textarea {
 
 .landing-character-stage {
   display: grid;
-  place-items: center start;
+  place-items: center;
   min-width: 0;
   align-self: center;
+  padding-left: 16px;
 }
 
 .landing-character {
@@ -451,11 +453,11 @@ textarea {
   padding: 10px;
   border: 2px solid var(--ink);
   background: #ffffff;
-  cursor: grab;
+  cursor: pointer;
 }
 
 .task-row:active {
-  cursor: grabbing;
+  cursor: pointer;
 }
 
 .task-row:hover,
