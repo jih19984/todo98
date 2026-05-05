@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import { LogOut, Settings, ShoppingCart } from "lucide-react";
 import { TaskEditor } from "@/components/tasks/TaskEditor";
 import { TaskList } from "@/components/tasks/TaskList";
 import { RetroButton } from "@/components/ui/RetroButton";
@@ -260,13 +262,34 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
 
   return (
     <main className="desktop-shell task-desktop">
+      <nav className="desktop-left-nav" aria-label="앱 메뉴">
+        <Link href="/shop" className="desktop-nav-link" aria-label="상점">
+          <ShoppingCart size={20} aria-hidden="true" />
+          <span>상점</span>
+        </Link>
+      </nav>
       <aside className="right-rail" aria-label="사용자 패널">
         <RetroWindow title="User.ini" className="account-window">
           <p className="eyebrow">Signed in</p>
-          <p>{userEmail}</p>
-          <RetroButton type="button" onClick={() => void handleSignOut()}>
-            로그아웃
-          </RetroButton>
+          <div className="account-profile">
+            <img
+              className="account-character"
+              src="/animations/todo98-character.webp"
+              alt="대표 캐릭터"
+              width="92"
+              height="172"
+              draggable={false}
+            />
+            <p>{userEmail}</p>
+          </div>
+          <div className="account-actions" aria-label="프로필 메뉴">
+            <RetroButton type="button" aria-label="로그아웃" onClick={() => void handleSignOut()}>
+              <LogOut size={16} aria-hidden="true" />
+            </RetroButton>
+            <Link className="account-icon-link" href="/mypage" aria-label="마이페이지">
+              <Settings size={16} aria-hidden="true" />
+            </Link>
+          </div>
         </RetroWindow>
         <RetroWindow title={missionMode === "daily" ? "Daily.mission" : "Weekly.mission"} className="mission-window">
           <div className="mission-toggle" aria-label="미션 보기">
@@ -287,13 +310,13 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
               주간 미션
             </RetroButton>
           </div>
-          <p className="mission-points">Points {earnedPoints}P</p>
+          <p className="mission-points">Points {earnedPoints}TP</p>
           <ul className="mission-list">
             {visibleMissions.map((mission) => (
               <li className={mission.done ? "mission-item is-done" : "mission-item"} key={mission.label}>
                 <span>{mission.done ? "✓" : ""}</span>
                 <p>{mission.label}</p>
-                <strong>+{mission.points}P</strong>
+                <strong>+{mission.points}TP</strong>
               </li>
             ))}
           </ul>

@@ -377,24 +377,24 @@ describe("TaskDesktop", () => {
     );
 
     expect(screen.getByText("Daily.mission")).toBeInTheDocument();
-    expect(screen.getByText("Points 30P")).toBeInTheDocument();
+    expect(screen.getByText("Points 30TP")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "2026-05-06 할 일 보기" }));
 
     expect(screen.getByText("내일 할 일")).toBeInTheDocument();
     expect(screen.queryByText("오늘 미션")).not.toBeInTheDocument();
-    expect(screen.getByText("Points 30P")).toBeInTheDocument();
+    expect(screen.getByText("Points 30TP")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "주간 미션" }));
 
     expect(screen.getByText("Weekly.mission")).toBeInTheDocument();
     expect(screen.getByText("이번 주 할 일 10개 완료")).toBeInTheDocument();
-    expect(screen.getByText("Points 0P")).toBeInTheDocument();
+    expect(screen.getByText("Points 0TP")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "2026-05-12 할 일 보기" }));
 
     expect(screen.getByText("다음 주 첫 할 일")).toBeInTheDocument();
-    expect(screen.getByText("Points 0P")).toBeInTheDocument();
+    expect(screen.getByText("Points 0TP")).toBeInTheDocument();
   });
 
   it("changes the visible calendar month without opening that date until a day is clicked", async () => {
@@ -445,6 +445,9 @@ describe("TaskDesktop", () => {
   it("signs out from the account window", async () => {
     const user = userEvent.setup();
     render(<TaskDesktop userEmail="me@example.com" initialTasks={[]} />);
+
+    expect(screen.getByAltText("대표 캐릭터")).toHaveAttribute("src", "/animations/todo98-character.webp");
+    expect(screen.getByRole("link", { name: "마이페이지" })).toHaveAttribute("href", "/mypage");
 
     await user.click(screen.getByRole("button", { name: "로그아웃" }));
 

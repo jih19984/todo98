@@ -52,6 +52,7 @@ export default async function Home({ searchParams }: HomeProps = {}) {
             alt=""
             width="360"
             height="674"
+            draggable={false}
             loading="eager"
           />
         </div>
