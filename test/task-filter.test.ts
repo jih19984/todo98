@@ -14,7 +14,7 @@ const baseTask: TaskRecord = {
 };
 
 describe("task filters", () => {
-  it("returns today's open tasks for the today filter", () => {
+  it("returns today's tasks even after completion for the today filter", () => {
     const tasks: TaskRecord[] = [
       { ...baseTask, id: "today", due_date: "2026-05-03" },
       { ...baseTask, id: "future", due_date: "2026-05-04" },
@@ -23,6 +23,7 @@ describe("task filters", () => {
 
     expect(filterTasks(tasks, "today", new Date("2026-05-03T12:00:00.000Z")).map((task) => task.id)).toEqual([
       "today",
+      "done",
     ]);
   });
 

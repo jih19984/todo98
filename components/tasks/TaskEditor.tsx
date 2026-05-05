@@ -35,29 +35,33 @@ export function TaskEditor({ mode = "create", initialTask, onSubmit, onCancel }:
   }
 
   return (
-    <form className="task-editor" onSubmit={handleSubmit}>
-      <div className="task-editor-grid">
-        <label className="task-editor-field" htmlFor="task-title">
-          할 일 제목
-          <RetroInput id="task-title" value={title} onChange={(event) => setTitle(event.target.value)} />
-        </label>
-        <label className="task-editor-field task-editor-note" htmlFor="task-note">
-          메모
-          <textarea
-            id="task-note"
-            className="retro-input retro-textarea"
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-          />
-        </label>
-        <div className="task-editor-actions">
-          <RetroButton type="submit">{mode === "edit" ? "수정 저장" : "추가"}</RetroButton>
-          {onCancel && (
-            <RetroButton type="button" onClick={onCancel}>
-              취소
-            </RetroButton>
-          )}
-        </div>
+    <form className="task-editor task-compose-row" onSubmit={handleSubmit}>
+      <span className="task-compose-check" aria-hidden="true" />
+      <div className="task-compose-fields">
+        <RetroInput
+          id="task-title"
+          className="task-compose-title"
+          aria-label="할 일 제목"
+          placeholder="할 일 제목"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+        <textarea
+          id="task-note"
+          className="retro-input retro-textarea task-compose-note"
+          aria-label="메모"
+          placeholder="메모"
+          value={note}
+          onChange={(event) => setNote(event.target.value)}
+        />
+      </div>
+      <div className="task-editor-actions">
+        <RetroButton type="submit">{mode === "edit" ? "수정 저장" : "추가"}</RetroButton>
+        {onCancel && (
+          <RetroButton type="button" onClick={onCancel}>
+            취소
+          </RetroButton>
+        )}
       </div>
     </form>
   );

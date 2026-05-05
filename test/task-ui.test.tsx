@@ -147,6 +147,9 @@ describe("TaskDesktop", () => {
     render(<TaskDesktop userEmail="me@example.com" initialTasks={[]} />);
 
     expect(screen.queryByLabelText("마감일")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("할 일 제목").closest("form")).toHaveClass("task-compose-row");
+    expect(screen.getByLabelText("할 일 제목")).toHaveAttribute("placeholder", "할 일 제목");
+    expect(screen.getByLabelText("메모")).toHaveAttribute("placeholder", "메모");
 
     await user.type(screen.getByLabelText("할 일 제목"), "도메인 구매하기");
     await user.type(screen.getByLabelText("메모"), "Vercel 연결 전에 후보 확인");
@@ -157,6 +160,8 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("Vercel 연결 전에 후보 확인")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "도메인 구매하기 완료" }));
+    expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "도메인 구매하기 완료 취소" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "완료" }));
 
     expect(screen.getByText("도메인 구매하기")).toBeInTheDocument();

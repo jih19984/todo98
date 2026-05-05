@@ -236,27 +236,54 @@ textarea {
 }
 
 .task-editor {
-  display: grid;
   margin-bottom: 18px;
 }
 
-.task-editor-grid {
+.task-compose-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  column-gap: 18px;
-  row-gap: 14px;
-  align-items: end;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 10px;
+  border: 2px solid var(--ink);
+  background: #ffffff;
 }
 
-.task-editor-field {
+.task-compose-check {
+  width: 26px;
+  height: 26px;
+  display: inline-grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  background: #ffffff;
+  box-shadow:
+    inset 2px 2px 0 rgba(17, 17, 17, 0.18),
+    2px 2px 0 var(--shadow);
+}
+
+.task-compose-fields {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
-  font-weight: 900;
 }
 
-.task-editor-note {
-  grid-column: 1 / -1;
+.task-compose-title,
+.task-compose-note {
+  border: 0;
+  box-shadow: none;
+  min-height: auto;
+  padding: 0;
+}
+
+.task-compose-title {
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.task-compose-title:focus,
+.task-compose-note:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
 }
 
 .retro-textarea {
@@ -269,6 +296,8 @@ textarea {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  align-self: end;
 }
 
 .task-list {
@@ -440,9 +469,17 @@ textarea {
   }
 
   .task-toolbar,
-  .task-editor-grid {
+  .task-compose-row {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .task-compose-check {
+    display: none;
+  }
+
+  .task-editor-actions {
+    justify-content: flex-start;
   }
 
   .task-row {

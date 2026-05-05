@@ -69,7 +69,7 @@ export function filterTasks(tasks: TaskRecord[], filter: TaskFilter, today = new
 
   if (filter === "today") {
     const todayKey = dateKey(today);
-    return tasks.filter((task) => !task.completed_at && task.due_date === todayKey);
+    return tasks.filter((task) => task.due_date === todayKey);
   }
 
   return tasks.filter((task) => !task.completed_at);
