@@ -397,6 +397,51 @@ describe("TaskDesktop", () => {
     expect(screen.getByText("Points 0P")).toBeInTheDocument();
   });
 
+  it("changes the visible calendar month without opening that date until a day is clicked", async () => {
+    const user = userEvent.setup();
+    render(
+      <TaskDesktop
+        userEmail="me@example.com"
+        initialTasks={[
+          {
+            id: "task-1",
+            user_id: "local",
+            title: "오늘 할 일",
+            note: null,
+            due_date: "2026-05-05",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2026-05-05T00:00:00.000Z",
+            updated_at: "2026-05-05T00:00:00.000Z",
+          },
+          {
+            id: "task-2",
+            user_id: "local",
+            title: "이월 할 일",
+            note: null,
+            due_date: "2027-02-02",
+            priority: "normal",
+            completed_at: null,
+            created_at: "2027-02-02T00:00:00.000Z",
+            updated_at: "2027-02-02T00:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    await user.selectOptions(screen.getByLabelText("년도"), "2027");
+    await user.selectOptions(screen.getByLabelText("월"), "1");
+
+    expect(screen.getByRole("button", { name: "2027-02-02 할 일 보기" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "오늘 할 일" })).toBeInTheDocument();
+    expect(screen.queryByText("이월 할 일")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "2027-02-02 할 일 보기" }));
+
+    expect(screen.getByText("2027. 02. 02 할 일")).toBeInTheDocument();
+    expect(screen.getByText("이월 할 일")).toBeInTheDocument();
+  });
+
   it("signs out from the account window", async () => {
     const user = userEvent.setup();
     render(<TaskDesktop userEmail="me@example.com" initialTasks={[]} />);

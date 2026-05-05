@@ -53,10 +53,15 @@ function buildCalendarDays(selectedDate: Date) {
   return [...blanks, ...days];
 }
 
+function buildYearOptions(centerYear: number) {
+  return Array.from({ length: 5 }, (_, index) => centerYear - 2 + index);
+}
+
 export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDesktopProps) {
   const [tasks, setTasks] = useState<TaskRecord[]>(initialTasks);
   const [filter, setFilter] = useState<TaskFilter>("today");
   const [selectedDate, setSelectedDate] = useState(dateKey(new Date()));
+  const [calendarViewDate, setCalendarViewDate] = useState(dateFromKey(dateKey(new Date())));
   const [missionMode, setMissionMode] = useState<MissionMode>("daily");
   const [editingTask, setEditingTask] = useState<TaskRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +95,13 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
   ];
   const visibleMissions = missionMode === "daily" ? dailyMissions : weeklyMissions;
   const earnedPoints = visibleMissions.reduce((sum, mission) => sum + (mission.done ? mission.points : 0), 0);
-  const calendarDays = buildCalendarDays(selectedDateValue);
+  const calendarDays = buildCalendarDays(calendarViewDate);
+  const calendarYears = buildYearOptions(todayDateValue.getFullYear());
+  const calendarMonths = Array.from({ length: 12 }, (_, index) => index);
+
+  function updateCalendarView(year: number, month: number) {
+    setCalendarViewDate(new Date(year, month, 1));
+  }
 
   function reorderTask(draggedId: string, targetId: string) {
     setTasks((current) => {
@@ -289,9 +300,36 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
         </RetroWindow>
         <RetroWindow title="Calendar.exe" className="calendar-window">
           <div className="calendar-heading">
-            <strong>
-              {selectedDateValue.getFullYear()}. {String(selectedDateValue.getMonth() + 1).padStart(2, "0")}
-            </strong>
+            <label>
+              <span>년도</span>
+              <select
+                className="retro-select calendar-select"
+                aria-label="년도"
+                value={calendarViewDate.getFullYear()}
+                onChange={(event) => updateCalendarView(Number(event.target.value), calendarViewDate.getMonth())}
+              >
+                {calendarYears.map((year) => (
+                  <option value={year} key={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>월</span>
+              <select
+                className="retro-select calendar-select"
+                aria-label="월"
+                value={calendarViewDate.getMonth()}
+                onChange={(event) => updateCalendarView(calendarViewDate.getFullYear(), Number(event.target.value))}
+              >
+                {calendarMonths.map((month) => (
+                  <option value={month} key={month}>
+                    {String(month + 1).padStart(2, "0")}월
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="calendar-weekdays" aria-hidden="true">
             {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
@@ -301,7 +339,7 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
           <div className="calendar-grid">
             {calendarDays.map((day, index) => {
               if (!day) return <span className="calendar-empty" key={`blank-${index}`} />;
-              const key = dateKey(new Date(selectedDateValue.getFullYear(), selectedDateValue.getMonth(), day));
+              const key = dateKey(new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), day));
               const taskCount = tasks.filter((task) => task.due_date === key).length;
               return (
                 <button
@@ -325,7 +363,6 @@ export function TaskDesktop({ userEmail, userId, initialTasks = [] }: TaskDeskto
       <RetroWindow title="Today.tasks" className="tasks-window">
         <div className="task-toolbar">
           <div>
-            <p className="eyebrow">Todo98</p>
             <h1>{selectedDate === todayKey ? "오늘 할 일" : `${formatDisplayDate(selectedDate)} 할 일`}</h1>
           </div>
           <div className="filter-row" aria-label="필터">
